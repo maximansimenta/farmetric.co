@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Farmetric — Farmer Traceability Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--forest:#1a3d2b;--forest-mid:#2d5a3d;--forest-light:#3d7a55;--gold:#c9923a;--gold-light:#e4b06a;--cream:#f5efe3;--cream-dark:#ede4d0;--bark:#8b6347;--bark-light:#b8956e;--charcoal:#2a2118;--muted:#7a6a55;--success:#27ae60;--warn:#e67e22;--danger:#c0392b;--info:#2980b9;--shadow:0 4px 18px rgba(26,61,43,0.09);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--charcoal);min-height:100vh;overflow-x:hidden;}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:228px;background:var(--forest);display:flex;flex-direction:column;z-index:100;padding:0 0 20px;}
+.logo-wrap{padding:24px 22px 20px;border-bottom:1px solid rgba(255,255,255,0.07);}
+.logo-mark{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--gold-light);letter-spacing:.02em;display:block;line-height:1;}
+.logo-sub{font-size:9.5px;color:rgba(255,255,255,0.35);letter-spacing:.18em;text-transform:uppercase;display:block;margin-top:3px;}
+.nav-section{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,0.28);padding:0 22px;margin:18px 0 6px;}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 22px;color:rgba(255,255,255,0.5);cursor:pointer;font-size:13px;font-weight:400;transition:all .2s;border-left:2px solid transparent;user-select:none;}
+.nav-item:hover{color:rgba(255,255,255,0.85);background:rgba(255,255,255,0.05);}
+.nav-item.active{color:var(--gold-light);border-left-color:var(--gold);background:rgba(201,146,58,0.1);}
+.nav-item svg{opacity:.65;flex-shrink:0;width:15px;height:15px;}
+.nav-item.active svg{opacity:1;}
+.nav-badge{margin-left:auto;background:var(--gold);color:white;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;}
+.nav-badge.warn{background:#e67e22;}
+.sidebar-footer{margin:auto 16px 0;padding:14px;background:rgba(255,255,255,0.04);border-radius:8px;border:1px solid rgba(255,255,255,0.07);}
+.sf-label{font-size:9.5px;color:rgba(255,255,255,0.28);letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px;}
+.sf-value{font-size:12.5px;color:rgba(255,255,255,0.65);font-weight:500;}
+.main{margin-left:228px;min-height:100vh;}
+.topbar{background:rgba(245,239,227,0.97);backdrop-filter:blur(12px);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--cream-dark);position:sticky;top:0;z-index:50;}
+.topbar-left{display:flex;align-items:center;gap:10px;}
+.topbar-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;color:var(--forest);}
+.topbar-crumb{font-size:11.5px;color:var(--muted);cursor:pointer;}
+.topbar-crumb:hover{color:var(--forest);}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.notif-btn{width:34px;height:34px;background:white;border:1.5px solid var(--cream-dark);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:border-color .2s;}
+.notif-btn:hover{border-color:var(--forest);}
+.notif-dot{position:absolute;top:6px;right:7px;width:7px;height:7px;background:var(--danger);border-radius:50%;border:1.5px solid white;}
+.btn{padding:7px 16px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .2s;letter-spacing:.02em;}
+.btn-primary{background:var(--forest);color:white;} .btn-primary:hover{background:var(--forest-mid);}
+.btn-gold{background:var(--gold);color:white;} .btn-gold:hover{background:var(--gold-light);}
+.btn-outline{background:white;color:var(--charcoal);border:1.5px solid var(--cream-dark);} .btn-outline:hover{border-color:var(--forest);color:var(--forest);}
+.content{padding:28px 32px;}
+.card{background:white;border-radius:12px;border:1px solid var(--cream-dark);overflow:hidden;}
+.card-head{padding:16px 22px 12px;border-bottom:1px solid var(--cream-dark);display:flex;align-items:center;justify-content:space-between;}
+.card-title{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:var(--forest);}
+.card-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.card-body{padding:18px 22px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px;}
+.g14{display:grid;grid-template-columns:1fr 1.4fr;gap:20px;}
+.mb16{margin-bottom:16px;} .mb20{margin-bottom:20px;} .mb28{margin-bottom:28px;}
+.mc{background:white;border-radius:11px;padding:18px 20px;border:1px solid var(--cream-dark);position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;}
+.mc:hover{transform:translateY(-2px);box-shadow:var(--shadow);}
+.mc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.mc.green::before{background:linear-gradient(90deg,var(--forest),var(--forest-light));}
+.mc.gold::before{background:linear-gradient(90deg,var(--gold),var(--gold-light));}
+.mc.bark::before{background:linear-gradient(90deg,var(--bark),var(--bark-light));}
+.mc.teal::before{background:linear-gradient(90deg,#16a085,#1abc9c);}
+.mc.blue::before{background:linear-gradient(90deg,#2980b9,#3498db);}
+.mc.red::before{background:linear-gradient(90deg,var(--danger),#e74c3c);}
+.mc.purple::before{background:linear-gradient(90deg,#6c3483,#a569bd);}
+.mc-icon{width:32px;height:32px;border-radius:7px;background:var(--cream);display:flex;align-items:center;justify-content:center;margin-bottom:11px;}
+.mc-val{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:600;color:var(--forest);line-height:1;letter-spacing:-.01em;}
+.mc-label{font-size:11px;color:var(--muted);margin-top:3px;font-weight:400;}
+.mc-delta{font-size:10.5px;font-weight:600;margin-top:7px;display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:4px;background:#e8f5e9;color:#2e7d32;}
+.mc-delta.warn{background:#fff3e0;color:#e65100;} .mc-delta.info{background:#e3f2fd;color:#0d47a1;} .mc-delta.purple{background:#f3e5f5;color:#4a148c;}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:5px;font-size:10.5px;font-weight:600;letter-spacing:.04em;}
+.badge-green{background:#e8f5e9;color:#1b5e20;border:1px solid #a5d6a7;} .badge-gold{background:#fff8e1;color:#5d4000;border:1px solid #ffe082;}
+.badge-blue{background:#e3f2fd;color:#0d47a1;border:1px solid #90caf9;} .badge-red{background:#fce4ec;color:#880e4f;border:1px solid #f48fb1;}
+.badge-grey{background:#f5f5f5;color:#555;border:1px solid #ddd;} .badge-teal{background:#e0f2f1;color:#004d40;border:1px solid #80cbc4;}
+.badge-purple{background:#f3e5f5;color:#4a148c;border:1px solid #ce93d8;}
+.tbl{width:100%;border-collapse:collapse;}
+.tbl th{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:10px 14px;text-align:left;border-bottom:2px solid var(--cream-dark);background:var(--cream);}
+.tbl td{padding:10px 14px;border-bottom:1px solid var(--cream-dark);font-size:13px;color:var(--charcoal);vertical-align:middle;}
+.tbl tr:last-child td{border-bottom:none;} .tbl tr:hover td{background:rgba(26,61,43,0.02);}
+.tbl td.mono{font-family:'DM Mono',monospace;font-size:11.5px;color:var(--muted);}
+.tbl-action{color:var(--forest-light);cursor:pointer;font-size:12px;font-weight:600;}
+.tbl-action:hover{color:var(--forest);}
+.prog-track{height:7px;background:var(--cream-dark);border-radius:4px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--forest),var(--forest-light));transition:width 1.2s cubic-bezier(.16,1,.3,1);}
+.prog-fill.gold{background:linear-gradient(90deg,var(--gold),var(--gold-light));} .prog-fill.teal{background:linear-gradient(90deg,#16a085,#1abc9c);}
+.prog-fill.red{background:linear-gradient(90deg,var(--danger),#e74c3c);} .prog-fill.purple{background:linear-gradient(90deg,#6c3483,#a569bd);}
+.tag{font-size:10px;padding:2px 7px;border-radius:4px;font-weight:500;border:1px solid;}
+.tag-g{background:#e8f5e9;color:#1b5e20;border-color:#a5d6a7;} .tag-o{background:#fff8e1;color:#6d4c00;border-color:#ffe082;}
+.tag-b{background:#e3f2fd;color:#0d47a1;border-color:#90caf9;} .tag-r{background:#fce4ec;color:#880e4f;border-color:#f48fb1;}
+.search-wrap{display:flex;align-items:center;gap:7px;background:white;border:1.5px solid var(--cream-dark);border-radius:8px;padding:7px 13px;transition:border-color .2s;}
+.search-wrap:focus-within{border-color:var(--forest-light);}
+.search-wrap input{border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:12.5px;color:var(--charcoal);background:transparent;width:100%;}
+.search-wrap input::placeholder{color:var(--muted);}
+.pill{padding:5px 13px;border-radius:20px;font-size:11.5px;font-weight:500;cursor:pointer;border:1.5px solid var(--cream-dark);background:white;color:var(--muted);transition:all .2s;user-select:none;}
+.pill:hover{border-color:var(--forest-light);color:var(--forest);} .pill.active{background:var(--forest);color:white;border-color:var(--forest);}
+/* FARMER CARD */
+.fc{background:white;border-radius:12px;border:1px solid var(--cream-dark);overflow:hidden;cursor:pointer;transition:all .22s;animation:fadeUp .4s ease both;}
+.fc:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(26,61,43,0.1);border-color:var(--forest-light);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fc-head{background:linear-gradient(135deg,var(--forest) 0%,#1f5035 100%);padding:16px;display:flex;align-items:flex-start;gap:11px;position:relative;}
+.fc-portrait{width:54px;height:54px;border-radius:50%;border:2.5px solid rgba(255,255,255,0.25);overflow:hidden;flex-shrink:0;background:var(--cream-dark);}
+.fc-portrait svg{width:100%;height:100%;}
+.fc-name{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;color:white;line-height:1.1;}
+.fc-id{font-family:'DM Mono',monospace;font-size:9.5px;color:rgba(255,255,255,0.4);margin-top:2px;}
+.fc-dbadge{position:absolute;top:11px;right:13px;background:rgba(255,255,255,0.11);color:rgba(255,255,255,0.75);font-size:9.5px;font-weight:600;padding:2px 7px;border-radius:4px;letter-spacing:.05em;text-transform:uppercase;}
+.fc-vstamp{position:absolute;bottom:11px;right:13px;display:flex;align-items:center;gap:3px;font-size:9.5px;font-weight:600;padding:2px 7px;border-radius:4px;letter-spacing:.06em;text-transform:uppercase;}
+.fc-vstamp.v{background:rgba(39,174,96,0.18);color:#7dffaa;} .fc-vstamp.p{background:rgba(201,146,58,0.22);color:var(--gold-light);}
+.fc-body{padding:13px 16px;}
+.fc-stats{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:11px;}
+.fc-stat{background:var(--cream);border-radius:7px;padding:8px 10px;}
+.fc-stat-l{font-size:9.5px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.07em;margin-bottom:2px;}
+.fc-stat-v{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:var(--forest);line-height:1;}
+.fc-stat-u{font-size:9.5px;color:var(--muted);}
+.fc-welfare{display:flex;gap:5px;margin-bottom:10px;flex-wrap:wrap;}
+.fc-welfare-item{display:flex;align-items:center;gap:3px;font-size:10px;color:var(--muted);}
+.fc-foot{padding:9px 16px;border-top:1px solid var(--cream-dark);display:flex;align-items:center;justify-content:space-between;}
+.fc-coop{font-size:10.5px;color:var(--muted);}
+.fc-coop strong{color:var(--charcoal);font-weight:500;}
+.fc-date{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);}
+/* COOP CARD */
+.coop-card{background:white;border-radius:11px;border:1px solid var(--cream-dark);overflow:hidden;cursor:pointer;transition:all .22s;}
+.coop-card:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--forest-light);}
+.coop-head{background:linear-gradient(135deg,var(--forest-mid),var(--forest));padding:18px 20px;}
+.coop-name{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;color:white;margin-bottom:2px;}
+.coop-district{font-size:10.5px;color:rgba(255,255,255,0.5);letter-spacing:.08em;text-transform:uppercase;}
+.coop-body{padding:14px 18px;}
+.coop-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--cream-dark);}
+.coop-row:last-child{border-bottom:none;}
+.coop-row-l{font-size:11.5px;color:var(--muted);}
+.coop-row-v{font-size:13px;font-weight:600;color:var(--charcoal);}
+.coop-foot{padding:10px 18px;background:var(--cream);border-top:1px solid var(--cream-dark);font-size:11.5px;color:var(--muted);}
+/* TIMELINE */
+.timeline{position:relative;padding-left:18px;}
+.timeline::before{content:'';position:absolute;left:5px;top:0;bottom:0;width:1.5px;background:var(--cream-dark);}
+.tl-item{position:relative;margin-bottom:14px;padding-left:16px;}
+.tl-item::before{content:'';position:absolute;left:-13px;top:5px;width:8px;height:8px;border-radius:50%;background:var(--forest-light);border:2px solid white;box-shadow:0 0 0 1.5px var(--forest-light);}
+.tl-date{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:1px;}
+.tl-event{font-size:12.5px;color:var(--charcoal);}
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(20,30,22,0.7);backdrop-filter:blur(5px);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal{background:white;border-radius:14px;width:100%;max-width:700px;max-height:90vh;overflow-y:auto;animation:mIn .28s cubic-bezier(.16,1,.3,1);}
+@keyframes mIn{from{opacity:0;transform:scale(.96) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal-head{background:linear-gradient(135deg,var(--forest),#1f5035);padding:26px 30px;position:relative;}
+.modal-close{position:absolute;top:18px;right:18px;width:30px;height:30px;background:rgba(255,255,255,0.1);border:none;border-radius:7px;color:rgba(255,255,255,0.65);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:background .2s;}
+.modal-close:hover{background:rgba(255,255,255,0.2);color:white;}
+.modal-portrait{width:64px;height:64px;border-radius:50%;border:3px solid rgba(255,255,255,0.25);overflow:hidden;flex-shrink:0;background:var(--cream-dark);}
+.modal-name{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:white;margin-bottom:3px;}
+.modal-meta{font-family:'DM Mono',monospace;font-size:11px;color:rgba(255,255,255,0.4);letter-spacing:.06em;}
+.modal-badges{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap;}
+.m-badge{padding:4px 10px;border-radius:5px;font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;}
+.mb-g{background:rgba(39,174,96,.18);color:#7dffaa;} .mb-o{background:rgba(201,146,58,.22);color:var(--gold-light);}
+.mb-w{background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);}
+.modal-body{padding:24px 30px;}
+.m-section{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;color:var(--forest);margin-bottom:11px;padding-bottom:7px;border-bottom:1px solid var(--cream-dark);margin-top:20px;}
+.m-section:first-child{margin-top:0;}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:4px;}
+.di-l{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:2px;}
+.di-v{font-size:13.5px;font-weight:500;color:var(--charcoal);}
+/* CHART */
+.bar-chart{display:flex;align-items:flex-end;gap:6px;padding:0 4px;}
+.bc-group{flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;}
+.bc-bar{width:100%;border-radius:4px 4px 0 0;transition:height 1.2s cubic-bezier(.16,1,.3,1);cursor:pointer;min-width:12px;}
+.bc-bar.g{background:linear-gradient(to top,var(--forest),var(--forest-light));} .bc-bar.gold{background:linear-gradient(to top,var(--gold),var(--gold-light));}
+.bc-bar.teal{background:linear-gradient(to top,#16a085,#1abc9c);} .bc-bar.purple{background:linear-gradient(to top,#6c3483,#a569bd);}
+.bc-bar:hover{opacity:.8;}
+/* BUYER CARD */
+.buyer-card{background:white;border-radius:11px;border:1px solid var(--cream-dark);overflow:hidden;transition:all .22s;}
+.buyer-card:hover{transform:translateY(-2px);box-shadow:var(--shadow);}
+.buyer-head{padding:18px 20px;border-bottom:1px solid var(--cream-dark);display:flex;align-items:center;gap:13px;}
+.buyer-logo{width:46px;height:46px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;color:white;flex-shrink:0;}
+.buyer-name{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:var(--forest);}
+.buyer-type{font-size:11px;color:var(--muted);margin-top:2px;}
+.buyer-body{padding:14px 20px;}
+.buyer-stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:12px;}
+.bs-item{text-align:center;padding:9px;background:var(--cream);border-radius:7px;}
+.bs-val{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--forest);}
+.bs-label{font-size:10px;color:var(--muted);margin-top:2px;}
+.buyer-foot{padding:11px 20px;background:var(--cream);border-top:1px solid var(--cream-dark);display:flex;align-items:center;justify-content:space-between;}
+/* COMPLIANCE */
+.comp-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--cream-dark);}
+.comp-row:last-child{border-bottom:none;}
+.status-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.dot-g{background:#27ae60;} .dot-o{background:#e67e22;} .dot-r{background:#c0392b;} .dot-b{background:#2980b9;}
+/* STAT STRIP */
+.stat-strip{display:flex;border:1px solid var(--cream-dark);border-radius:10px;overflow:hidden;background:white;margin-bottom:20px;}
+.ss-item{flex:1;padding:14px 16px;border-right:1px solid var(--cream-dark);text-align:center;}
+.ss-item:last-child{border-right:none;}
+.ss-val{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--forest);}
+.ss-label{font-size:10.5px;color:var(--muted);margin-top:3px;}
+/* ALERT */
+.alert{border-radius:8px;padding:12px 16px;font-size:12.5px;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px;line-height:1.5;}
+.alert-warn{background:#fff8e1;color:#5d4000;border:1px solid #ffe082;} .alert-success{background:#e8f5e9;color:#1b5e20;border:1px solid #a5d6a7;}
+.alert-info{background:#e3f2fd;color:#0d47a1;border:1px solid #90caf9;}
+/* PAGINATION */
+.pag{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:22px;}
+.pag-btn{width:32px;height:32px;border-radius:7px;border:1.5px solid var(--cream-dark);background:white;color:var(--charcoal);font-size:12.5px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;font-family:'DM Sans',sans-serif;}
+.pag-btn:hover{border-color:var(--forest);color:var(--forest);} .pag-btn.active{background:var(--forest);border-color:var(--forest);color:white;font-weight:600;}
+.pag-btn:disabled{opacity:.35;cursor:not-allowed;}
+/* FARMER PROFILE */
+.fp-hero{background:linear-gradient(135deg,var(--forest) 0%,#1f5a38 100%);border-radius:14px;padding:28px 32px;display:flex;align-items:flex-start;gap:22px;margin-bottom:22px;position:relative;overflow:hidden;}
+.fp-hero::after{content:'';position:absolute;right:-50px;bottom:-50px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,0.03);}
+.fp-portrait{width:78px;height:78px;border-radius:50%;border:3px solid rgba(255,255,255,0.25);overflow:hidden;flex-shrink:0;background:var(--cream-dark);}
+.fp-portrait svg{width:100%;height:100%;}
+.fp-name{font-family:'Cormorant Garamond',serif;font-size:29px;font-weight:600;color:white;line-height:1;}
+.fp-id{font-family:'DM Mono',monospace;font-size:11px;color:rgba(255,255,255,0.4);letter-spacing:.07em;margin-top:3px;}
+.fp-badges{display:flex;gap:7px;margin-top:11px;flex-wrap:wrap;}
+.fp-meta-row{display:flex;gap:22px;margin-top:13px;flex-wrap:wrap;}
+.fp-ml{font-size:9.5px;color:rgba(255,255,255,0.4);letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px;}
+.fp-mv{font-size:13px;color:rgba(255,255,255,0.82);font-weight:500;}
+.fp-score-badge{margin-left:auto;text-align:center;background:rgba(255,255,255,0.07);border-radius:12px;padding:15px 20px;border:1px solid rgba(255,255,255,0.11);flex-shrink:0;}
+.fp-score-lbl{font-size:9.5px;color:rgba(255,255,255,0.4);letter-spacing:.12em;text-transform:uppercase;margin-top:5px;}
+/* CREDIT SCORE */
+.credit-tier{padding:3px 11px;border-radius:20px;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;}
+.tier-prime{background:#e8f5e9;color:#1b5e20;border:1.5px solid #66bb6a;} .tier-standard{background:#fff8e1;color:#5d4000;border:1.5px solid #ffca28;}
+.tier-building{background:#e3f2fd;color:#0d47a1;border:1.5px solid #42a5f5;} .tier-limited{background:#fce4ec;color:#880e4f;border:1.5px solid #f48fb1;}
+.score-component{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.score-comp-track{flex:1;height:8px;background:var(--cream-dark);border-radius:4px;overflow:hidden;}
+.score-comp-fill{height:100%;border-radius:4px;transition:width 1.4s cubic-bezier(.16,1,.3,1);}
+/* IMPACT HUB */
+.impact-hero{background:linear-gradient(135deg,#0d2e1c 0%,#1a3d2b 50%,#1a4a35 100%);border-radius:14px;padding:36px;margin-bottom:24px;position:relative;overflow:hidden;}
+.impact-hero::before{content:'🌿';font-size:180px;position:absolute;right:-20px;bottom:-40px;opacity:.06;}
+.ih-title{font-family:'Cormorant Garamond',serif;font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:8px;}
+.ih-headline{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:600;color:white;line-height:1.15;margin-bottom:6px;}
+.ih-sub{font-size:13.5px;color:rgba(255,255,255,0.55);max-width:560px;line-height:1.6;}
+.ih-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:28px;}
+.ih-stat{background:rgba(255,255,255,0.07);border-radius:10px;padding:16px;border:1px solid rgba(255,255,255,0.08);}
+.ih-stat-val{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;color:var(--gold-light);line-height:1;}
+.ih-stat-label{font-size:10.5px;color:rgba(255,255,255,0.45);margin-top:4px;line-height:1.4;}
+/* TOC FLOW */
+.toc-flow{display:flex;align-items:stretch;gap:0;}
+.toc-step{flex:1;padding:18px 16px;border-radius:0;position:relative;text-align:center;}
+.toc-step:first-child{border-radius:10px 0 0 10px;}
+.toc-step:last-child{border-radius:0 10px 10px 0;}
+.toc-step-bad{background:#fce4ec;border:1px solid #f48fb1;}
+.toc-step-good{background:#e8f5e9;border:1px solid #a5d6a7;}
+.toc-arrow{display:flex;align-items:center;padding:0 4px;font-size:22px;color:var(--muted);}
+.toc-icon{font-size:24px;margin-bottom:6px;}
+.toc-label{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px;}
+.toc-desc{font-size:11.5px;line-height:1.4;color:var(--muted);}
+/* SDG GRID */
+.sdg-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;}
+.sdg-card{border-radius:9px;padding:12px;text-align:center;border:1.5px solid transparent;cursor:default;transition:transform .2s;}
+.sdg-card:hover{transform:translateY(-2px);}
+.sdg-num{font-family:'DM Mono',monospace;font-size:10px;font-weight:700;margin-bottom:3px;}
+.sdg-name{font-size:10px;font-weight:600;margin-bottom:5px;}
+.sdg-metric{font-size:9.5px;line-height:1.3;opacity:.8;}
+/* SROI */
+.sroi-slider{width:100%;-webkit-appearance:none;height:6px;border-radius:3px;background:var(--cream-dark);outline:none;margin:12px 0;}
+.sroi-slider::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--forest);cursor:pointer;border:3px solid white;box-shadow:0 2px 8px rgba(26,61,43,0.3);}
+.sroi-result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px;}
+.sroi-result{background:var(--cream);border-radius:9px;padding:14px;text-align:center;}
+.sroi-result-val{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--forest);line-height:1;}
+.sroi-result-label{font-size:10.5px;color:var(--muted);margin-top:4px;}
+/* WELFARE */
+.welfare-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.welfare-item{background:var(--cream);border-radius:9px;padding:12px;text-align:center;}
+.welfare-icon{font-size:22px;margin-bottom:5px;}
+.welfare-val{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--forest);}
+.welfare-label{font-size:10.5px;color:var(--muted);margin-top:2px;}
+/* AUDIT */
+.audit-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--cream-dark);}
+.audit-row:last-child{border-bottom:none;}
+.audit-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+/* STORY QUOTE */
+.farmer-story{background:linear-gradient(135deg,#f9f3e8,#f0e8d4);border-radius:10px;padding:20px 22px;border-left:4px solid var(--gold);margin-bottom:20px;position:relative;}
+.farmer-story::before{content:'"';font-family:'Cormorant Garamond',serif;font-size:80px;color:var(--gold-light);opacity:.3;position:absolute;top:-10px;left:14px;line-height:1;}
+.story-text{font-family:'Cormorant Garamond',serif;font-size:17px;font-style:italic;color:var(--charcoal);line-height:1.7;margin-bottom:10px;padding-left:10px;}
+.story-attr{font-size:11.5px;color:var(--muted);padding-left:10px;}
+/* MAP SVG */
+.district-map-svg .d-poly{cursor:pointer;transition:all .2s;}
+.district-map-svg .d-poly:hover{filter:brightness(1.2);}
+.district-map-svg .d-poly.sel{filter:brightness(1.3);stroke-width:2.5;}
+/* TOOLTIP */
+.tooltip{position:fixed;background:var(--charcoal);color:white;font-size:10.5px;padding:4px 9px;border-radius:5px;pointer-events:none;opacity:0;transition:opacity .15s;white-space:nowrap;z-index:999;font-family:'DM Mono',monospace;}
+/* NOTIF PANEL */
+.notif-panel{position:fixed;top:68px;right:20px;width:320px;background:white;border-radius:12px;border:1px solid var(--cream-dark);box-shadow:0 8px 32px rgba(26,61,43,0.12);z-index:150;display:none;animation:mIn .2s ease;}
+.notif-panel.open{display:block;}
+.notif-head{padding:14px 18px;border-bottom:1px solid var(--cream-dark);display:flex;align-items:center;justify-content:space-between;}
+.notif-head-title{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;color:var(--forest);}
+.notif-item{padding:12px 18px;border-bottom:1px solid var(--cream-dark);cursor:pointer;}
+.notif-item:hover{background:var(--cream);}
+.notif-item:last-child{border-bottom:none;}
+.notif-item-title{font-size:12.5px;font-weight:500;color:var(--charcoal);margin-bottom:2px;}
+.notif-item-sub{font-size:11px;color:var(--muted);}
+.notif-item-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px;}
+/* INCOME CHART (mini sparkline bars) */
+.income-bars{display:flex;align-items:flex-end;gap:3px;height:52px;}
+.ib{border-radius:3px 3px 0 0;transition:height 1s ease;cursor:pointer;}
+.ib:hover{opacity:.8;}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo-wrap">
+    <span class="logo-mark">Farmetric</span>
+    <span class="logo-sub">Traceability Platform</span>
+  </div>
+  <nav id="sidebarNav">
+    <div class="nav-section">Overview</div>
+    <div class="nav-item active" data-page="dashboard"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</div>
+    <div class="nav-item" data-page="farmers"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Farmers<span class="nav-badge">1,247</span></div>
+    <div class="nav-item" data-page="cooperatives"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Cooperatives</div>
+    <div class="nav-section">Analytics</div>
+    <div class="nav-item" data-page="transactions"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Transactions</div>
+    <div class="nav-item" data-page="production"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Production</div>
+    <div class="nav-item" data-page="carbon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Carbon Credits</div>
+    <div class="nav-item" data-page="market"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Market Access</div>
+    <div class="nav-section">Compliance</div>
+    <div class="nav-item" data-page="eudr"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><polyline points="9 15 11 17 15 13"/></svg>EUDR Reports<span class="nav-badge warn">14</span></div>
+    <div class="nav-item" data-page="audit"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Verification Audit</div>
+    <div class="nav-section">Partnerships</div>
+    <div class="nav-item" data-page="partnerships"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><circle cx="9" cy="7" r="4"/></svg>Buyer Partnerships</div>
+    <div class="nav-item" data-page="impact"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>Impact Hub</div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sf-label">Active Region</div>
+    <div class="sf-value">Northern Uganda · Season 2025</div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-title" id="topTitle">Dashboard</div>
+      <div class="topbar-crumb" id="topCrumb"></div>
+    </div>
+    <div class="topbar-right" id="topActions">
+      <div class="notif-btn" id="notifBtn">
+        <svg width="16" height="16" fill="none" stroke="var(--charcoal)" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <div class="notif-dot"></div>
+      </div>
+    </div>
+  </div>
+  <div class="content" id="pageContent"></div>
+</main>
+
+<!-- NOTIFICATION PANEL -->
+<div class="notif-panel" id="notifPanel">
+  <div class="notif-head"><span class="notif-head-title">Notifications</span><span style="font-size:11px;color:var(--muted);cursor:pointer">Mark all read</span></div>
+  ${[
+    {t:'EUDR deadline approaching',s:'14 farmers need GPS verification — April 30',c:'dot-r'},
+    {t:"L'Oréal audit confirmed",s:'Third-party audit booked: April 12, 2025',c:'dot-g'},
+    {t:'Unilever volume request',s:'Q2 guarantee needed to advance 65t contract',c:'dot-o'},
+    {t:'Otuke field officer overdue',s:'Last sync: 6 weeks ago. Action required.',c:'dot-r'},
+    {t:'Carbon MOU — govt response',s:'Ministry of Water & Environment response pending',c:'dot-b'},
+  ].map(n=>`<div class="notif-item" style="display:flex;gap:10px;align-items:flex-start">
+    <div class="notif-item-dot ${n.c}" style="margin-top:4px"></div>
+    <div><div class="notif-item-title">${n.t}</div><div class="notif-item-sub">${n.s}</div></div>
+  </div>`).join('')}
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-head" id="mHead">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div style="display:flex;align-items:center;gap:16px">
+        <div class="modal-portrait" id="mPortrait"></div>
+        <div>
+          <div class="modal-name" id="mName"></div>
+          <div class="modal-meta" id="mMeta"></div>
+        </div>
+      </div>
+      <div class="modal-badges" id="mBadges"></div>
+    </div>
+    <div class="modal-body" id="mBody"></div>
+  </div>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// PORTRAIT SVGs — 8 warm illustrated African faces
+// ═══════════════════════════════════════════════════
+const PORTRAITS=[
+`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="40" r="40" fill="#c8956c"/><ellipse cx="40" cy="50" rx="21" ry="23" fill="#7a4528"/><path d="M19 32 Q20 14 40 12 Q60 14 61 32 Q58 20 40 20 Q22 20 19 32Z" fill="#e07b1a"/><path d="M16 30 Q18 22 40 20 Q62 22 64 30 Q60 18 40 17 Q20 18 16 30Z" fill="#f4a030"/><ellipse cx="34" cy="44" rx="3" ry="2.8" fill="white"/><ellipse cx="46" cy="44" rx="3" ry="2.8" fill="white"/><circle cx="34.8" cy="44.2" r="1.8" fill="#1a0d00"/><circle cx="46.8" cy="44.2" r="1.8" fill="#1a0d00"/><circle cx="35.4" cy="43.6" r="0.6" fill="white"/><circle cx="47.4" cy="43.6" r="0.6" fill="white"/><path d="M36 38 Q34 36 32 38" stroke="#5c2f0e" stroke-width="1" fill="none"/><path d="M44 38 Q46 36 48 38" stroke="#5c2f0e" stroke-width="1" fill="none"/><ellipse cx="40" cy="50" rx="2.2" ry="1.3" fill="#5c2f0e"/><path d="M34.5 56 Q40 61 45.5 56" stroke="#5c2f0e" stroke-width="1.8" fill="none" stroke-linecap="round"/><ellipse cx="34" cy="47" rx="2" ry="1.2" fill="#c47a50" opacity="0.5"/><ellipse cx="46" cy="47" rx="2" ry="1.2" fill="#c47a50" opacity="0.5"/><path d="M19 80 Q24 64 40 61 Q56 64 61 80Z" fill="#e07b1a"/></svg>`,
+`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="40" r="40" fill="#b07850"/><ellipse cx="40" cy="50" rx="20" ry="22" fill="#6b3d1e"/><path d="M20 36 Q18 16 40 13 Q62 16 60 36 Q56 22 40 21 Q24 22 20 36Z" fill="#2c6fad"/><path d="M16 28 Q20 18 40 16 Q60 18 64 28" stroke="#1a4a7a" stroke-width="4" fill="none"/><ellipse cx="34" cy="44" rx="2.8" ry="2.6" fill="white"/><ellipse cx="46" cy="44" rx="2.8" ry="2.6" fill="white"/><circle cx="34.7" cy="44.2" r="1.7" fill="#1a0d00"/><circle cx="46.7" cy="44.2" r="1.7" fill="#1a0d00"/><circle cx="35.2" cy="43.7" r="0.55" fill="white"/><circle cx="47.2" cy="43.7" r="0.55" fill="white"/><path d="M32 37.5 Q34 36 36 37.5" stroke="#4a2010" stroke-width="1" fill="none"/><path d="M44 37.5 Q46 36 48 37.5" stroke="#4a2010" stroke-width="1" fill="none"/><ellipse cx="40" cy="49.5" rx="2" ry="1.2" fill="#4a2010"/><path d="M35 56.5 Q40 60.5 45 56.5" stroke="#4a2010" stroke-width="1.7" fill="none" stroke-linecap="round"/><path d="M19 80 Q25 65 40 62 Q55 65 61 80Z" fill="#2c6fad"/></svg>`,
+`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="40" r="40" fill="#d4956a"/><path d="M22 20 Q22 8 40 7 Q58 8 58 20 Q55 10 40 10 Q25 10 22 20Z" fill="#2c1810"/><path d="M22 20 Q20 26 20 32" stroke="#2c1810" stroke-width="3.5" fill="none"/><path d="M58 20 Q60 26 60 32" stroke="#2c1810" stroke-width="3.5" fill="none"/><line x1="27" y1="9" x2="24" y2="25" stroke="#3d2218" stroke-width="2.5"/><line x1="34" y1="7.5" x2="32" y2="24" stroke="#3d2218" stroke-width="2.5"/><line x1="40" y1="7" x2="40" y2="23" stroke="#3d2218" stroke-width="2.5"/><line x1="46" y1="7.5" x2="48" y2="24" stroke="#3d2218" stroke-width="2.5"/><line x1="53" y1="9" x2="56" y2="25" stroke="#3d2218" stroke-width="2.5"/><ellipse cx="40" cy="50" rx="20" ry="22" fill="#8b5230"/><ellipse cx="33.5" cy="44" rx="3.2" ry="3" fill="white"/><ellipse cx="46.5" cy="44" rx="3.2" ry="3" fill="white"/><circle cx="34.4" cy="44.3" r="2" fill="#1a0800"/><circle cx="47.4" cy="44.3" r="2" fill="#1a0800"/><circle cx="35" cy="43.7" r="0.65" fill="white"/><circle cx="48" cy="43.7" r="0.65" fill="white"/><path d="M31 38 Q33.5 36.5 36 38" stroke="#5a2e12" stroke-width="1.1" fill="none"/><path d="M44 38 Q46.5 36.5 49 38" stroke="#5a2e12" stroke-width="1.1" fill="none"/><ellipse cx="40" cy="50" rx="2.2" ry="1.4" fill="#5a2e12"/><path d="M34.5 56.5 Q40 61.5 45.5 56.5" stroke="#5a2e12" stroke-width="1.9" fill="none" stroke-linecap="round"/><ellipse cx="33.5" cy="47" rx="2.5" ry="1.5" fill="#c07545" opacity="0.45"/><ellipse cx="46.5" cy="47" rx="2.5" ry="1.5" fill="#c07545" opacity="0.45"/><path d="M20 80 Q26 63 40 60 Q54 63 60 80Z" fill="#2c6040"/></svg>`,
+`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="40" r="40" fill="#a06840"/><ellipse cx="40" cy="50" rx="21" ry="23" fill="#5c3218"/><ellipse cx="40" cy="22" rx="22" ry="14" fill="#2c1810"/><ellipse cx="40" cy="20" rx="20" ry="10" fill="#1a0d00" opacity="0.5"/><ellipse cx="33.5" cy="44" rx="3" ry="2.8" fill="white"/><ellipse cx="46.5" cy="44" rx="3" ry="2.8" fill="white"/><circle cx="34.3" cy="44.2" r="1.9" fill="#0d0500"/><circle cx="47.3" cy="44.2" r="1.9" fill="#0d0500"/><circle cx="34.9" cy="43.6" r="0.6" fill="white"/><circle cx="47.9" cy="43.6" r="0.6" fill="white"/><path d="M30.5 38.5 Q33 37 35.5 38.5" stroke="#3d1c08" stroke-width="1.2" fill="none"/><path d="M44.5 38.5 Q47 37 49.5 38.5" stroke="#3d1c08" stroke-width="1.2" fill="none"/><ellipse cx="40" cy="50" rx="2.5" ry="1.5" fill="#3d1c08"/><path d="M34 56 Q40 61.5 46 56" stroke="#3d1c08" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M18 80 Q24 63 40 60 Q56 63 62 80Z" fill="#1a4a2a"/></svg>`,
+`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="40" r="40" fill="#c08050"/><ellipse cx="40" cy="50" rx="21" ry="23" fill="#7a4828"/><ellipse cx="40" cy="22" rx="21" ry="13" fill="#1a0d00"/><ellipse cx="40" cy="58" rx="19" ry="8" fill="#1a0d00" opacity="0.6"/><ellipse cx="33.5" cy="43.5" rx="3.2" ry="3" fill="white"/><ellipse cx="46.5" cy="43.5" rx="3.2" ry="3" fill="white"/><circle cx="34.4" cy="43.7" r="2" fill="#0d0500"/><circle cx="47.4" cy="43.7" r="2" fill="#0d0500"/><circle cx="35" cy="43.1" r="0.65" fill="white"/><circle cx="48" cy="43.1" r="0.65" fill="white"/><path d="M30 38 Q33 36.5 36 38" stroke="#4a2410" stroke-width="1.2" fill="none"/><path d="M44 38 Q47 36.5 50 38" stroke="#4a2410" stroke-width="1.2" fill="none"/><ellipse cx="40" cy="50" rx="2.5" ry="1.5" fill="#3a1a08"/><path d="M35 56 Q40 60 45 56" stroke="#3a1a08" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M19 80 Q25 64 40 61 Q55 64 61 80Z" fill="#4a7a3a"/></svg>`,
+`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="40" r="40" fill="#b87c4c"/><ellipse cx="40" cy="50" rx="20" ry="22" fill="#6a3c1c"/><path d="M20 36 Q18 16 40 13 Q62 16 60 36 Q58 22 40 21 Q22 22 20 36Z" fill="#f0e8d8"/><path d="M16 30 Q20 22 40 20 Q60 22 64 30 Q60 24 40 23 Q20 24 16 30Z" fill="#e8dece"/><path d="M20 30 Q18 40 20 46" stroke="#d8cebe" stroke-width="3" fill="none"/><path d="M60 30 Q62 40 60 46" stroke="#d8cebe" stroke-width="3" fill="none"/><ellipse cx="34" cy="44" rx="2.8" ry="2.6" fill="white"/><ellipse cx="46" cy="44" rx="2.8" ry="2.6" fill="white"/><circle cx="34.7" cy="44.2" r="1.7" fill="#1a0800"/><circle cx="46.7" cy="44.2" r="1.7" fill="#1a0800"/><circle cx="35.2" cy="43.6" r="0.55" fill="white"/><circle cx="47.2" cy="43.6" r="0.55" fill="white"/><path d="M31 38 Q34 36.5 37 38" stroke="#4a2010" stroke-width="1" fill="none"/><path d="M43 38 Q46 36.5 49 38" stroke="#4a2010" stroke-width="1" fill="none"/><ellipse cx="40" cy="50" rx="2" ry="1.2" fill="#4a2010"/><path d="M35 56 Q40 60.5 45 56" stroke="#4a2010" stroke-width="1.7" fill="none" stroke-linecap="round"/><path d="M19 80 Q25 65 40 62 Q55 65 61 80Z" fill="#f0e8d8"/></svg>`,
+`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="40" r="40" fill="#c8905e"/><ellipse cx="40" cy="50" rx="20" ry="22" fill="#7a4830"/><path d="M20 34 Q19 16 40 13 Q61 16 60 34 Q58 20 40 19 Q22 20 20 34Z" fill="#1a7a5a"/><path d="M16 28 Q20 20 40 18 Q60 20 64 28" stroke="#155f45" stroke-width="3.5" fill="none"/><ellipse cx="20" cy="34" rx="5" ry="8" fill="#1a7a5a"/><ellipse cx="60" cy="34" rx="5" ry="8" fill="#1a7a5a"/><ellipse cx="33.5" cy="44" rx="3" ry="2.8" fill="white"/><ellipse cx="46.5" cy="44" rx="3" ry="2.8" fill="white"/><circle cx="34.3" cy="44.2" r="1.9" fill="#0d0500"/><circle cx="47.3" cy="44.2" r="1.9" fill="#0d0500"/><circle cx="34.9" cy="43.6" r="0.6" fill="white"/><circle cx="47.9" cy="43.6" r="0.6" fill="white"/><path d="M31.5 38.5 Q34 37 36.5 38.5" stroke="#4e2410" stroke-width="1.1" fill="none"/><path d="M43.5 38.5 Q46 37 48.5 38.5" stroke="#4e2410" stroke-width="1.1" fill="none"/><ellipse cx="40" cy="50" rx="2.2" ry="1.3" fill="#4e2410"/><path d="M34.5 56.5 Q40 61.5 45.5 56.5" stroke="#4e2410" stroke-width="1.8" fill="none" stroke-linecap="round"/><ellipse cx="33" cy="47" rx="2.2" ry="1.3" fill="#c07848" opacity="0.4"/><ellipse cx="47" cy="47" rx="2.2" ry="1.3" fill="#c07848" opacity="0.4"/><path d="M19 80 Q25 64 40 61 Q55 64 61 80Z" fill="#1a7a5a"/></svg>`,
+`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="40" r="40" fill="#ba8050"/><ellipse cx="40" cy="50" rx="21" ry="23" fill="#704028"/><ellipse cx="40" cy="21" rx="21" ry="13" fill="#2a1808"/><ellipse cx="40" cy="17" rx="18" ry="8" fill="#1a0d00" opacity="0.7"/><ellipse cx="33.5" cy="44" rx="3" ry="2.8" fill="white"/><ellipse cx="46.5" cy="44" rx="3" ry="2.8" fill="white"/><circle cx="34.3" cy="44.2" r="1.9" fill="#0d0500"/><circle cx="47.3" cy="44.2" r="1.9" fill="#0d0500"/><circle cx="34.9" cy="43.6" r="0.6" fill="white"/><circle cx="47.9" cy="43.6" r="0.6" fill="white"/><path d="M30.5 38.5 Q33 37 35.5 38.5" stroke="#3d1c08" stroke-width="1.2" fill="none"/><path d="M44.5 38.5 Q47 37 49.5 38.5" stroke="#3d1c08" stroke-width="1.2" fill="none"/><ellipse cx="40" cy="50" rx="2.5" ry="1.5" fill="#3a1808"/><path d="M34.5 56 Q40 61 45.5 56" stroke="#3a1808" stroke-width="1.9" fill="none" stroke-linecap="round"/><path d="M20 80 Q26 63 40 60 Q54 63 60 80Z" fill="#c9923a"/><path d="M33 62 Q40 61 47 62 L47 67 Q40 66 33 67Z" fill="#a07020" opacity="0.7"/></svg>`
+];
+
+function getPortrait(id){return PORTRAITS[(parseInt(id.replace('FMT-',''))-1)%PORTRAITS.length];}
+
+// ═══════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════
+const FARMERS=[
+  {id:'FMT-001',name:'Margaret Akello',phone:'+256770123456',district:'Pader',gender:'F',coop:'Pader Shea Butter Cooperative',officer:'Leonora Abalo',acres:3.2,trees:87,yield:1.8,crop:'Shea',verified:true,lastUpdate:'Mar 2025',joined:'Dec 2024',tags:['EUDR Ready','Organic','Carbon'],txns:3,revenue:'UGX 9.1M',gps:'3.028°N, 33.182°E',creditScore:724,creditTier:'Prime',dependents:6,childrenInSchool:4,foodSecurity:3.8,seasonalIncome:[180000,195000,216000],story:"Before Farmetric, I had no way to prove where my shea came from. Now buyers know my name and my trees. My children are all in school this year for the first time."},
+  {id:'FMT-002',name:'Lucy Akello',phone:'+256770123456',district:'Agago',gender:'F',coop:'Agago District Farmers Assoc.',officer:'Ongom Charles',acres:2.1,trees:53,yield:1.1,crop:'Shea',verified:true,lastUpdate:'Feb 2025',joined:'Dec 2024',tags:['EUDR Ready','Carbon'],txns:1,revenue:'UGX 5.8M',gps:'2.891°N, 33.320°E',creditScore:661,creditTier:'Standard',dependents:4,childrenInSchool:3,foodSecurity:3.2,seasonalIncome:[140000,148000,168000],story:"I used to sell to whoever came to the village. Now I have a record and a fair price. The cooperative officer registered my farm and it changed everything."},
+  {id:'FMT-003',name:'Esther Acuku',phone:'+256770123456',district:'Agago',gender:'F',coop:'Omot Farmers Cooperative',officer:'Ongom Charles',acres:1.8,trees:44,yield:0.9,crop:'Shea',verified:true,lastUpdate:'Feb 2025',joined:'Dec 2024',tags:['EUDR Ready'],txns:0,revenue:'UGX 3.2M',gps:'2.910°N, 33.489°E',creditScore:598,creditTier:'Standard',dependents:5,childrenInSchool:2,foodSecurity:2.8,seasonalIncome:[120000,125000,134000],story:"I have farmed shea my whole life but no one ever wrote down my name or my land. Now I have a number. That means something."},
+  {id:'FMT-004',name:'Catherine Angwech',phone:'+256770123456',district:'Lamwo',gender:'F',coop:'Lamwo Shea Nut Farmers Assoc.',officer:'Cavine Pinyoloya',acres:4.5,trees:112,yield:2.3,crop:'Shea',verified:true,lastUpdate:'Mar 2025',joined:'Dec 2024',tags:['EUDR Ready','Organic','Top Producer'],txns:2,revenue:'UGX 12.4M',gps:'3.564°N, 32.887°E',creditScore:781,creditTier:'Prime',dependents:8,childrenInSchool:5,foodSecurity:4.2,seasonalIncome:[195000,214000,248000],story:"I am the top producer in Lamwo. But for twenty years no buyer knew that. The platform gave me a voice. I set the terms now."},
+  {id:'FMT-005',name:'Alfred Aluk',phone:'+256770123456',district:'Otuke',gender:'M',coop:'Anepkide-olilim PDM SACCO',officer:'Aaba Ambrose',acres:2.7,trees:68,yield:1.4,crop:'Sunflower',verified:true,lastUpdate:'Jan 2025',joined:'Dec 2024',tags:['Pending EUDR'],txns:0,revenue:'UGX 4.7M',gps:'2.418°N, 33.901°E',creditScore:542,creditTier:'Building',dependents:7,childrenInSchool:3,foodSecurity:2.6,seasonalIncome:[155000,158000,162000],story:"My GPS is still pending. I wait for the officer. But I trust the system is coming."},
+  {id:'FMT-006',name:'Betty Auma',phone:'+256770123456',district:'Lamwo',gender:'F',coop:'Lamwo Shea Nut Farmers Assoc.',officer:'Cavine Pinyoloya',acres:2.0,trees:51,yield:1.0,crop:'Shea',verified:false,lastUpdate:'Dec 2024',joined:'Dec 2024',tags:['Verification Pending'],txns:0,revenue:'—',gps:'Pending',creditScore:340,creditTier:'Limited',dependents:3,childrenInSchool:1,foodSecurity:2.2,seasonalIncome:[90000,92000,0],story:"I have just enrolled. I am waiting for my verification visit."},
+  {id:'FMT-007',name:'Josphine Otto',phone:'+256770123456',district:'Kitgum',gender:'F',coop:'Dano Aye Lonyo Cooperative',officer:'Odyek Charles',acres:3.8,trees:96,yield:2.0,crop:'Shea',verified:true,lastUpdate:'Mar 2025',joined:'Dec 2024',tags:['EUDR Ready','Top Producer'],txns:1,revenue:'UGX 10.8M',gps:'3.278°N, 32.901°E',creditScore:703,creditTier:'Prime',dependents:6,childrenInSchool:4,foodSecurity:3.9,seasonalIncome:[178000,192000,228000],story:"My first premium transaction was more than I earned in an entire year before. I have planted twelve new shea seedlings since."},
+  {id:'FMT-008',name:'Susan Adit',phone:'+256770123456',district:'Agago',gender:'F',coop:'Agago District Farmers Assoc.',officer:'Ongom Charles',acres:1.5,trees:38,yield:0.7,crop:'Groundnuts',verified:true,lastUpdate:'Feb 2025',joined:'Dec 2024',tags:['Carbon'],txns:0,revenue:'UGX 2.9M',gps:'2.870°N, 33.410°E',creditScore:561,creditTier:'Building',dependents:4,childrenInSchool:2,foodSecurity:2.7,seasonalIncome:[108000,112000,118000],story:"I joined the carbon programme. Even my small farm can help the environment now."},
+  {id:'FMT-009',name:'Nighty Akot',phone:'+256770123456',district:'Otuke',gender:'F',coop:'Anepkide-olilim PDM SACCO',officer:'Aaba Ambrose',acres:2.2,trees:55,yield:1.1,crop:'Shea',verified:false,lastUpdate:'Jan 2025',joined:'Dec 2024',tags:['Verification Pending'],txns:0,revenue:'—',gps:'Pending',creditScore:310,creditTier:'Limited',dependents:5,childrenInSchool:2,foodSecurity:2.0,seasonalIncome:[95000,98000,0],story:"I am new. I am waiting. I have heard the verified farmers earn more and I believe it will come."},
+  {id:'FMT-010',name:'Rosket Nyeko',phone:'+256770123456',district:'Kitgum',gender:'F',coop:'Dano Aye Lonyo Cooperative',officer:'Odyek Charles',acres:3.1,trees:79,yield:1.6,crop:'Shea',verified:true,lastUpdate:'Mar 2025',joined:'Dec 2024',tags:['EUDR Ready','Organic'],txns:1,revenue:'UGX 8.3M',gps:'3.299°N, 32.886°E',creditScore:688,creditTier:'Standard',dependents:5,childrenInSchool:3,foodSecurity:3.5,seasonalIncome:[165000,178000,198000],story:"My organic certification opened a door I did not know existed. I am now known by name in Germany."},
+  {id:'FMT-011',name:'Susan Lamunu',phone:'+256770123456',district:'Lamwo',gender:'F',coop:'Anepkide-olilim PDM SACCO',officer:'Cavine Pinyoloya',acres:1.9,trees:48,yield:0.9,crop:'Shea',verified:true,lastUpdate:'Feb 2025',joined:'Dec 2024',tags:['EUDR Ready'],txns:0,revenue:'UGX 3.7M',gps:'3.510°N, 32.844°E',creditScore:589,creditTier:'Standard',dependents:4,childrenInSchool:3,foodSecurity:3.1,seasonalIncome:[125000,130000,138000],story:"My record is complete. I am ready for my first premium buyer."},
+  {id:'FMT-012',name:'David Ongom',phone:'+256770123456',district:'Lamwo',gender:'M',coop:'Lamwo Shea Nut Farmers Assoc.',officer:'Cavine Pinyoloya',acres:5.1,trees:128,yield:2.6,crop:'Shea',verified:true,lastUpdate:'Mar 2025',joined:'Dec 2024',tags:['EUDR Ready','Top Producer','Carbon'],txns:4,revenue:'UGX 15.7M',gps:'3.589°N, 32.911°E',creditScore:812,creditTier:'Prime',dependents:9,childrenInSchool:6,foodSecurity:4.5,seasonalIncome:[210000,238000,284000],story:"Four transactions. I know what my trees are worth. I have not cut a single one for charcoal since I joined."},
+  {id:'FMT-013',name:'Paul Opira',phone:'+256770123456',district:'Lamwo',gender:'M',coop:'Lamwo Shea Nut Farmers Assoc.',officer:'Cavine Pinyoloya',acres:2.4,trees:60,yield:1.2,crop:'Groundnuts',verified:true,lastUpdate:'Feb 2025',joined:'Dec 2024',tags:['EUDR Ready'],txns:0,revenue:'UGX 4.1M',gps:'3.541°N, 32.899°E',creditScore:610,creditTier:'Standard',dependents:5,childrenInSchool:3,foodSecurity:3.0,seasonalIncome:[140000,144000,152000],story:"I was skeptical at first. But seeing my neighbour David earn four times more — I enrolled immediately."},
+  {id:'FMT-014',name:'Betty Lalam',phone:'+256770123456',district:'Agago',gender:'F',coop:'Agago District Farmers Assoc.',officer:'Ongom Charles',acres:2.8,trees:71,yield:1.5,crop:'Shea',verified:true,lastUpdate:'Mar 2025',joined:'Dec 2024',tags:['EUDR Ready','Carbon'],txns:1,revenue:'UGX 6.9M',gps:'2.901°N, 33.445°E',creditScore:644,creditTier:'Standard',dependents:6,childrenInSchool:4,foodSecurity:3.3,seasonalIncome:[155000,162000,184000],story:"The platform found me a buyer who cares about where their shea comes from. I care too."},
+  {id:'FMT-015',name:'Samuel Okello',phone:'+256770123456',district:'Kitgum',gender:'M',coop:'Dano Aye Lonyo Cooperative',officer:'Odyek Charles',acres:1.6,trees:41,yield:0.8,crop:'Sunflower',verified:true,lastUpdate:'Jan 2025',joined:'Dec 2024',tags:['Pending EUDR'],txns:0,revenue:'UGX 2.8M',gps:'3.288°N, 32.910°E',creditScore:510,creditTier:'Building',dependents:4,childrenInSchool:2,foodSecurity:2.5,seasonalIncome:[112000,115000,120000],story:"I am still building my profile. I know what I need to do next."},
+  {id:'FMT-016',name:'Christine Enume',phone:'+256770123456',district:'Pader',gender:'F',coop:'Abukamola PDM SACCO',officer:'Aaba Ambrose',acres:3.4,trees:86,yield:1.7,crop:'Shea',verified:true,lastUpdate:'Mar 2025',joined:'Dec 2024',tags:['EUDR Ready','Organic'],txns:2,revenue:'UGX 8.8M',gps:'2.998°N, 33.201°E',creditScore:698,creditTier:'Standard',dependents:6,childrenInSchool:4,foodSecurity:3.7,seasonalIncome:[175000,189000,212000],story:"Two sales this season. I am saving to buy a second plot."},
+  {id:'FMT-017',name:'Mangoleta Akite',phone:'+256770123456',district:'Agago',gender:'F',coop:'Agago District Farmers Assoc.',officer:'Ongom Charles',acres:1.2,trees:31,yield:0.6,crop:'Groundnuts',verified:false,lastUpdate:'Jan 2025',joined:'Dec 2024',tags:['Verification Pending'],txns:0,revenue:'—',gps:'Pending',creditScore:280,creditTier:'Limited',dependents:3,childrenInSchool:1,foodSecurity:1.8,seasonalIncome:[80000,82000,0],story:"I am the newest member. I am still learning but I am here."},
+  {id:'FMT-018',name:'Susan Apenyo',phone:'+256770123456',district:'Otuke',gender:'F',coop:'Anepkide-olilim PDM SACCO',officer:'Aaba Ambrose',acres:2.0,trees:50,yield:1.0,crop:'Shea',verified:true,lastUpdate:'Feb 2025',joined:'Dec 2024',tags:['EUDR Ready'],txns:0,revenue:'UGX 3.5M',gps:'2.423°N, 33.895°E',creditScore:573,creditTier:'Building',dependents:5,childrenInSchool:3,foodSecurity:3.0,seasonalIncome:[125000,128000,136000],story:"Verified and ready. I am proud to have my farm on the map."},
+];
+
+const COOPS=[
+  {name:'Pader Shea Butter Cooperative',district:'Pader',officer:'Leonora Abalo',farmers:371,verified:318,tonnes:89,premium:22,estRevenue:'UGX 448M',phone:'+256 772 441 821',established:'2018'},
+  {name:'Lamwo Shea Nut Farmers Assoc.',district:'Lamwo',officer:'Cavine Pinyoloya',farmers:204,verified:189,tonnes:61,premium:14,estRevenue:'UGX 307M',phone:'+256 753 208 541',established:'2016'},
+  {name:'Agago District Farmers Assoc.',district:'Agago',officer:'Ongom Charles',farmers:289,verified:245,tonnes:74,premium:18,estRevenue:'UGX 373M',phone:'+256 781 332 944',established:'2017'},
+  {name:'Omot Farmers Cooperative Society',district:'Agago',officer:'Ongom Charles',farmers:112,verified:88,tonnes:29,premium:6,estRevenue:'UGX 146M',phone:'+256 703 556 112',established:'2019'},
+  {name:'Dano Aye Lonyo Cooperative',district:'Kitgum',officer:'Odyek Charles',farmers:248,verified:201,tonnes:66,premium:17,estRevenue:'UGX 332M',phone:'+256 776 089 227',established:'2015'},
+  {name:'Anepkide-olilim PDM SACCO',district:'Otuke',officer:'Aaba Ambrose',farmers:135,verified:98,tonnes:31,premium:7,estRevenue:'UGX 156M',phone:'+256 754 673 318',established:'2020'},
+  {name:'Abukamola PDM SACCO',district:'Pader',officer:'Aaba Ambrose',farmers:88,verified:72,tonnes:22,premium:5,estRevenue:'UGX 111M',phone:'+256 701 448 827',established:'2021'},
+  {name:'Moroto-palabek Gem DEVT SACCO',district:'Lamwo',officer:'Okot Richard Aoyo',farmers:66,verified:45,tonnes:14,premium:2,estRevenue:'UGX 71M',phone:'+256 712 884 330',established:'2022'},
+];
+
+const BUYERS=[
+  {name:'NovaBotanica GmbH',country:'Germany',type:'Cosmetic Brand',logo:'NB',logoColor:'#1a3d2b',volume:'18t/year',price:'UGX 5,040/kg',premium:'20%',status:'Active Partner',eudr:'Compliant',requirements:['EUDR verified origin','GPS-level traceability','No deforestation link','Organic preferred'],deals:3,value:'UGX 90.7M',contact:'Thomas Becker, Head of Sourcing',desc:'Premium German cosmetics manufacturer. First buyer to sign EUDR-compliant sourcing agreement with Farmetric.'},
+  {name:'EuroBotanix SA',country:'France',type:'Cosmetic & Food',logo:'EB',logoColor:'#2c5364',volume:'32t/year',price:'UGX 4,900/kg',premium:'17%',status:'Active Partner',eudr:'Compliant',requirements:['EUDR documentation','Cooperative-level traceability','Women-farmer sourcing','Fair Trade cert preferred'],deals:1,value:'UGX 156.8M',contact:'Marie-Claire Dubois, Procurement',desc:'French beauty and health foods group. Second-largest buyer on the platform.'},
+  {name:'Unilever (Pilot)',country:'United Kingdom',type:'FMCG / Food',logo:'UL',logoColor:'#003087',volume:'65t/year',price:'UGX 4,800/kg',premium:'14%',status:'Pilot Negotiation',eudr:'In Process',requirements:['Blockchain traceability','Batch-level audit trail','ESG impact report','Volume consistency guarantee'],deals:0,value:'TBD',contact:'Amara Singh, Sustainable Sourcing',desc:'Pilot programme under Unilever Sustainable Living Plan. Largest potential buyer by volume.'},
+  {name:"L'Oréal Procurement",country:'France',type:'Cosmetic Brand',logo:'LO',logoColor:'#9b1b30',volume:'48t/year',price:'UGX 5,100/kg',premium:'21%',status:'LOI Signed',eudr:'Compliant',requirements:['EUDR full compliance','Shea Women Initiative','Third-party audit','Premium grade only'],deals:0,value:'TBD',contact:'Isabelle Fontaine, Raw Materials',desc:"L'Oréal Shea Women Initiative partner. LOI signed, full agreement conditional on Q2 audit."},
+  {name:'Blessed Organics LLC',country:'USA',type:'Specialty Food',logo:'BO',logoColor:'#5d7a3a',volume:'8t/year',price:'UGX 4,600/kg',premium:'10%',status:'Active Partner',eudr:'N/A',requirements:['Organic certification','Cooperative membership proof','Consistent quality grading'],deals:2,value:'UGX 36.8M',contact:'Elizabeth Isaac Apio, Buyer',desc:'US specialty food brand. First external buyer engaged during Farmetric field research.'},
+  {name:'Kahangi Estates',country:'Uganda',type:'Regional Processor',logo:'KE',logoColor:'#8b6347',volume:'12t/year',price:'UGX 4,400/kg',premium:'5%',status:'Active Partner',eudr:'N/A',requirements:['Volume predictability','Quality grading','Cooperative invoicing'],deals:4,value:'UGX 52.8M',contact:'Alan Tulip, CEO',desc:'Ugandan domestic processor. Critical for pilot commercial transactions and logistics.'},
+];
+
+function tagClass(t){if(t.includes('EUDR')||t.includes('Organic')||t.includes('Top'))return 'tag-g';if(t.includes('Carbon'))return 'tag-b';if(t.includes('Pending'))return 'tag-r';return 'tag-o';}
+function creditColor(s){return s>=720?'#27ae60':s>=580?'#c9923a':s>=450?'#2980b9':'#c0392b';}
+function tierCls(t){return t==='Prime'?'tier-prime':t==='Standard'?'tier-standard':t==='Building'?'tier-building':'tier-limited';}
+
+// ═══════════════════════════════════════════════════
+// ROUTER
+// ═══════════════════════════════════════════════════
+let farmerPage=1,perPage=6,farmerFilter='all',farmerSearch='';
+const TITLES={dashboard:'Dashboard',farmers:'Farmer Registry',cooperatives:'Cooperatives',transactions:'Transactions & Revenue',production:'Production Analytics',carbon:'Carbon Credits',market:'Market Access',eudr:'EUDR Reports',audit:'Verification Audit',partnerships:'Buyer Partnerships',impact:'Impact Hub',farmer_profile:'Farmer Profile'};
+
+function navigate(page,data=null){
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.toggle('active',el.dataset.page===page));
+  document.getElementById('topTitle').textContent=TITLES[page]||page;
+  document.getElementById('topCrumb').textContent='';
+  document.getElementById('topCrumb').onclick=null;
+  document.getElementById('topActions').innerHTML=`<div class="notif-btn" id="notifBtn"><svg width="16" height="16" fill="none" stroke="var(--charcoal)" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="notif-dot"></div></div>`;
+  document.getElementById('pageContent').innerHTML='';
+  const R={dashboard:renderDashboard,farmers:renderFarmers,cooperatives:renderCoops,transactions:renderTransactions,production:renderProduction,carbon:renderCarbon,market:renderMarket,eudr:renderEUDR,audit:renderAudit,partnerships:renderPartnerships,impact:renderImpact};
+  if(page==='farmer_profile'&&data)renderFarmerProfile(data);
+  else if(R[page])R[page]();
+  setTimeout(()=>{
+    const nb=document.getElementById('notifBtn');
+    if(nb)nb.onclick=toggleNotif;
+    animateAll();
+  },80);
+}
+
+// ═══════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════
+function renderDashboard(){
+  const pc=document.getElementById('pageContent');
+  const qD=[22,38,54,41,31,52,78,65],qM=Math.max(...qD);
+  const qBars=qD.map((v,i)=>`<div class="bc-group"><div class="bc-bar ${i%2===0?'g':'gold'}" style="height:0" data-h="${Math.round(v/qM*100)}" data-val="${v}t"></div></div>`).join('');
+
+  // Uganda — boundary from Natural Earth 110m shapefile (pyogrio bundle)
+  // 28 actual coordinate points, properly projected to SVG space
+  const mapSVG=`<svg viewBox="0 0 440 510" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:360px">
+  <defs>
+    <filter id="ms" x="-5%" y="-5%" width="115%" height="115%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="rgba(0,0,0,0.18)"/>
+    </filter>
+  </defs>
+  <rect width="440" height="510" fill="#ddd8c4" rx="6"/>
+  <polygon filter="url(#ms)" points="324.0,435.0 191.2,440.1 119.8,439.2 96.9,447.0 58.0,467.2 42.2,460.5 42.8,411.4 57.9,386.5 61.5,334.2 75.2,303.9 100.2,269.9 125.2,252.6 146.1,229.5 120.0,220.6 124.0,144.4 124.0,144.4 150.8,126.7 192.2,141.2 244.7,126.0 290.5,126.1 330.6,96.2 361.5,141.4 369.1,174.1 397.8,248.9 374.1,296.4 342.0,339.6 323.3,366.0 324.0,435.0"
+    fill="#c8dcb8" stroke="#7a9a6a" stroke-width="1.5" stroke-linejoin="round"/>
+  <polygon points="323.8,435.0 323.1,365.9 342.0,339.2 362.9,360.1 356.3,386.1 330.3,405.7 297.7,425.2 271.6,438.3 245.6,450.0 206.5,454.6 173.9,444.8 147.8,431.8 128.3,405.7 118.5,376.4 134.8,373.1 167.4,392.7 199.9,412.2 232.5,425.2 265.1,431.8 291.2,428.5 323.8,435.0" fill="#7abcd8" stroke="#5a9cbc" stroke-width="0.8"/>
+  <text x="226.0" y="405.7" font-family="DM Sans,sans-serif" font-size="9.5" fill="#3a7aa0" font-style="italic" text-anchor="middle">Lake Victoria</text>
+  <polygon class="d-poly" data-d="Lamwo" points="192.1,141.1 205.8,139.8 220.8,135.3 233.8,128.8 244.9,126.1 265.1,126.1 278.1,126.1 290.5,126.1 290.5,138.5 287.9,148.3 281.4,154.8 271.6,158.1 258.6,159.4 245.6,159.4 232.5,158.1 219.5,154.8 206.5,150.3 192.1,141.1"
+    fill="#1a3d2b" stroke="#c9923a" stroke-width="2" stroke-linejoin="round"/>
+  <text x="245.4" y="137.9" font-family="DM Sans,sans-serif" font-size="9.5" fill="white" font-weight="700" text-anchor="middle">LAMWO</text>
+  <text x="245.4" y="150.9" font-family="DM Mono,monospace" font-size="7.5" fill="rgba(255,255,255,0.85)" text-anchor="middle">204 farmers</text>
+  <polygon class="d-poly" data-d="Kitgum" points="290.5,126.1 300.9,124.2 310.1,125.5 323.8,126.1 330.9,96.2 361.5,141.1 369.4,174.4 343.3,177.6 330.3,184.1 317.2,187.4 304.2,187.4 294.4,184.1 287.9,177.6 281.4,171.1 281.4,154.8 287.9,148.3 290.5,138.5 290.5,126.1"
+    fill="#2d5a3d" stroke="#c9923a" stroke-width="2" stroke-linejoin="round"/>
+  <text x="310.9" y="147.8" font-family="DM Sans,sans-serif" font-size="9.5" fill="white" font-weight="700" text-anchor="middle">KITGUM</text>
+  <text x="310.9" y="160.8" font-family="DM Mono,monospace" font-size="7.5" fill="rgba(255,255,255,0.85)" text-anchor="middle">248 farmers</text>
+  <polygon class="d-poly" data-d="Pader" points="192.1,141.1 206.5,150.3 219.5,154.8 232.5,158.1 245.6,159.4 258.6,159.4 271.6,158.1 281.4,154.8 281.4,171.1 278.1,184.1 271.6,195.9 261.9,203.7 252.1,206.9 239.0,207.6 226.0,206.3 213.0,202.4 203.2,195.9 194.7,186.7 190.2,177.6 188.2,165.9 188.9,154.2 192.1,141.1"
+    fill="#1a3d2b" stroke="#c9923a" stroke-width="2" stroke-linejoin="round"/>
+  <text x="231.3" y="169.3" font-family="DM Sans,sans-serif" font-size="9.5" fill="white" font-weight="700" text-anchor="middle">PADER</text>
+  <text x="231.3" y="182.3" font-family="DM Mono,monospace" font-size="7.5" fill="rgba(255,255,255,0.85)" text-anchor="middle">371 farmers</text>
+  <polygon class="d-poly" data-d="Agago" points="281.4,154.8 287.9,177.6 294.4,184.1 304.2,187.4 317.2,187.4 330.3,184.1 343.3,177.6 336.8,197.2 327.0,208.9 314.0,216.7 300.9,220.6 287.9,220.6 278.1,216.7 271.6,208.9 271.6,195.9 278.1,184.1 281.4,171.1 281.4,154.8"
+    fill="#2d5a3d" stroke="#c9923a" stroke-width="2" stroke-linejoin="round"/>
+  <text x="299.3" y="186.6" font-family="DM Sans,sans-serif" font-size="9.5" fill="white" font-weight="700" text-anchor="middle">AGAGO</text>
+  <text x="299.3" y="199.6" font-family="DM Mono,monospace" font-size="7.5" fill="rgba(255,255,255,0.85)" text-anchor="middle">289 farmers</text>
+  <polygon class="d-poly" data-d="Otuke" points="252.1,206.9 261.9,203.7 271.6,195.9 271.6,208.9 278.1,216.7 287.9,220.6 300.9,220.6 300.9,231.1 294.4,238.9 281.4,244.1 268.4,245.4 255.3,242.8 244.3,236.3 239.0,227.1 237.7,218.0 242.3,211.5 252.1,206.9"
+    fill="#3d7a55" stroke="#c9923a" stroke-width="2" stroke-linejoin="round"/>
+  <text x="267.1" y="217.1" font-family="DM Sans,sans-serif" font-size="9.5" fill="white" font-weight="700" text-anchor="middle">OTUKE</text>
+  <text x="267.1" y="230.1" font-family="DM Mono,monospace" font-size="7.5" fill="rgba(255,255,255,0.85)" text-anchor="middle">135 farmers</text>
+  <circle cx="237.8" cy="352.5" r="5.5" fill="#c9923a" stroke="white" stroke-width="2"/>
+  <circle cx="237.8" cy="352.5" r="10" fill="none" stroke="#c9923a" stroke-width="0.8" opacity="0.5"/>
+  <text x="250.8" y="356.5" font-family="DM Sans,sans-serif" font-size="9" fill="#2a1800" font-weight="600">Kampala</text>
+  <text x="219.5" y="294.9" font-family="DM Sans,sans-serif" font-size="16" fill="#5a7a52" font-weight="700" letter-spacing="4" text-anchor="middle" opacity="0.28">UGANDA</text>
+  <text x="199.9" y="87.7" font-family="DM Sans,sans-serif" font-size="8" fill="#8a7a62" text-anchor="middle" letter-spacing="1.2" font-style="italic">SOUTH SUDAN</text>
+  <text x="199.9" y="487.4" font-family="DM Sans,sans-serif" font-size="8" fill="#8a7a62" text-anchor="middle" letter-spacing="1.2" font-style="italic">TANZANIA</text>
+  <text transform="rotate(90,416.5,242.8)" x="416.5" y="242.8" font-family="DM Sans,sans-serif" font-size="7.5" fill="#8a7a62" text-anchor="middle" letter-spacing="1" font-style="italic">KENYA</text>
+  <text transform="rotate(-90,16.0,275.4)" x="16.0" y="275.4" font-family="DM Sans,sans-serif" font-size="7" fill="#8a7a62" text-anchor="middle" letter-spacing="0.8" font-style="italic">D.R. CONGO</text>
+  <g transform="translate(404,63)">
+    <circle r="15" fill="white" opacity="0.88" stroke="#bbb" stroke-width="0.8"/>
+    <line x1="0" y1="12" x2="0" y2="-6" stroke="#444" stroke-width="1.3"/>
+    <polygon points="0,-15 -4,-3 4,-3" fill="#1a3d2b"/>
+    <text x="0" y="24" font-family="DM Sans,sans-serif" font-size="8" fill="#222" text-anchor="middle" font-weight="700">N</text>
+  </g>
+  <rect x="10" y="432" width="180" height="68" rx="5" fill="white" opacity="0.92" stroke="#c0b8a8" stroke-width="0.6"/>
+  <text x="18" y="445" font-family="DM Sans,sans-serif" font-size="7.5" fill="#555" font-weight="700" letter-spacing="0.8">LEGEND</text>
+  <rect x="18" y="449" width="9" height="9" rx="2" fill="#1a3d2b" stroke="#c9923a" stroke-width="1.5"/>
+  <text x="33" y="457" font-family="DM Sans,sans-serif" font-size="8" fill="#444">Farmetric districts (5)</text>
+  <rect x="18" y="463" width="9" height="9" rx="2" fill="#c8dcb8" stroke="#7a9a6a" stroke-width="1"/>
+  <text x="33" y="471" font-family="DM Sans,sans-serif" font-size="8" fill="#444">Rest of Uganda</text>
+  <circle cx="22" cy="481" r="4.5" fill="#c9923a" stroke="white" stroke-width="1.5"/>
+  <text x="33" y="485" font-family="DM Sans,sans-serif" font-size="8" fill="#444">Kampala (capital)</text>
+  <rect x="18" y="491" width="9" height="6" rx="1" fill="#7abcd8" stroke="#5a9cbc" stroke-width="0.5"/>
+  <text x="33" y="497" font-family="DM Sans,sans-serif" font-size="8" fill="#444">Lake Victoria</text>
+</svg>`;
+
+  pc.innerHTML=`
+  <!-- WHAT IS FARMETRIC -->
+  <div style="background:linear-gradient(135deg,var(--forest) 0%,#1f5038 100%);border-radius:14px;padding:26px 32px;margin-bottom:20px;display:flex;align-items:flex-start;justify-content:space-between;gap:28px;position:relative;overflow:hidden">
+    <div style="position:absolute;right:0;bottom:0;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,0.03);transform:translate(40px,40px)"></div>
+    <div style="flex:1">
+      <div style="font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:7px">What is Farmetric?</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:white;line-height:1.3;margin-bottom:10px">A data traceability platform giving smallholder shea farmers in Northern Uganda a verifiable record of who they are, what they own, and what they produce — for the first time.</div>
+      <div style="font-size:12.5px;color:rgba(255,255,255,0.6);line-height:1.6;max-width:520px">Data is collected via <strong style="color:var(--gold-light)">SMS and USSD</strong> through existing cooperative field officers — no smartphone required. Buyers pay an <strong style="color:var(--gold-light)">8% transaction fee</strong> for access to verified, EUDR-compliant shea. Farmers earn a <strong style="color:var(--gold-light)">20% price premium</strong> over the informal market.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0;min-width:140px">
+      <div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:9px;padding:12px 14px;text-align:center">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--gold-light)">8%</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.45);margin-top:2px">Buyer transaction fee</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:9px;padding:12px 14px;text-align:center">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--gold-light)">534t</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.45);margin-top:2px">Break-even (Year 3)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DATA FLOW DIAGRAM -->
+  <div class="card mb20">
+    <div class="card-head"><div><div class="card-title">How It Works</div><div class="card-sub">Data flow from farm to verified transaction — no smartphone required</div></div></div>
+    <div class="card-body" style="padding:18px 22px">
+      <div style="display:flex;align-items:center;gap:0;overflow-x:auto">
+        ${[
+          {icon:'🌿',label:'Farmer',sub:'Feature phone only',color:'#1a3d2b',textColor:'white'},
+          {arrow:'SMS / USSD',dir:'→'},
+          {icon:'👤',label:'Field Officer',sub:'Cooperative staff',color:'#2d5a3d',textColor:'white'},
+          {arrow:'Verifies & uploads',dir:'→'},
+          {icon:'🏛️',label:'Cooperative Hub',sub:'8 cooperatives',color:'#c9923a',textColor:'white'},
+          {arrow:'Aggregated data',dir:'→'},
+          {icon:'📊',label:'Farmetric Platform',sub:'Verified record created',color:'#1a3d2b',textColor:'white'},
+          {arrow:'EUDR-compliant data',dir:'→'},
+          {icon:'🏭',label:'Global Buyer',sub:"L'Oréal · Unilever · NovaBotanica",color:'#2c6fad',textColor:'white'},
+          {arrow:'8% fee + premium price',dir:'→'},
+          {icon:'💰',label:'Farmer Paid',sub:'+20% vs. informal market',color:'#27ae60',textColor:'white'},
+        ].map(s=>{
+          if(s.arrow) return `<div style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:0 6px;flex-shrink:0"><div style="font-size:18px;color:var(--muted)">${s.dir}</div><div style="font-size:9px;color:var(--muted);text-align:center;white-space:nowrap;max-width:80px;line-height:1.3">${s.arrow}</div></div>`;
+          return `<div style="display:flex;flex-direction:column;align-items:center;gap:5px;flex-shrink:0;min-width:88px"><div style="width:52px;height:52px;border-radius:12px;background:${s.color};display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 3px 10px rgba(0,0,0,0.15)">${s.icon}</div><div style="font-size:11px;font-weight:600;color:var(--charcoal);text-align:center">${s.label}</div><div style="font-size:9.5px;color:var(--muted);text-align:center;line-height:1.3">${s.sub}</div></div>`;
+        }).join('')}
+      </div>
+      <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--cream-dark);display:flex;gap:16px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)"><span style="width:10px;height:10px;border-radius:2px;background:var(--forest);display:inline-block"></span>Platform components</div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)"><span style="width:10px;height:10px;border-radius:2px;background:var(--gold);display:inline-block"></span>Cooperative network (existing infrastructure — no new hardware)</div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)"><span style="width:10px;height:10px;border-radius:2px;background:#27ae60;display:inline-block"></span>Revenue flows</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="g4 mb20">
+    <div class="mc green"><div class="mc-icon"><svg width="15" height="15" fill="none" stroke="var(--forest)" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="mc-val cu" data-t="1247">0</div><div class="mc-label">Registered Farmers</div><div class="mc-delta">↑ 18% this season</div></div>
+    <div class="mc gold"><div class="mc-icon"><svg width="15" height="15" fill="none" stroke="var(--gold)" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div><div class="mc-val cu" data-t="312">0</div><div class="mc-label">Verified Tonnes (2025)</div><div class="mc-delta">↑ 31% vs 2024</div></div>
+    <div class="mc purple"><div class="mc-icon"><svg width="15" height="15" fill="none" stroke="#6c3483" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div><div class="mc-val cu" data-t="7233">0</div><div class="mc-label">People Impacted</div><div class="mc-delta purple">Farmers + dependents</div></div>
+    <div class="mc teal"><div class="mc-icon"><svg width="15" height="15" fill="none" stroke="#16a085" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 4 12 14.01 9 11.01"/><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/></svg></div><div class="mc-val cu" data-t="891">0</div><div class="mc-label">Verified Profiles</div><div class="mc-delta">71.5% rate</div></div>
+  </div>
+  <div class="g2 mb20">
+    <div class="card">
+      <div class="card-head"><div><div class="card-title">District Map</div><div class="card-sub">Northern Uganda — click to filter</div></div></div>
+      <div class="card-body" style="padding:14px 18px">${mapSVG}</div>
+      <div class="card-body" style="padding:8px 18px 14px">
+        ${[{d:'Pader',n:371,w:78},{d:'Agago',n:289,w:61},{d:'Kitgum',n:248,w:52},{d:'Lamwo',n:204,w:43},{d:'Otuke',n:135,w:28}].map(r=>`
+        <div style="display:flex;align-items:center;gap:9px;margin-bottom:9px;cursor:pointer" onclick="farmerFilter='${r.d}';navigate('farmers')">
+          <span style="width:46px;font-size:11.5px;font-weight:500">${r.d}</span>
+          <div class="prog-track" style="flex:1"><div class="prog-fill" style="width:0" data-w="${r.w}%"></div></div>
+          <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);width:28px;text-align:right">${r.n}</span>
+        </div>`).join('')}
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><div class="card-title">Seasonal Production</div><div class="card-sub">Shea tonnage 2024–2025</div></div></div>
+      <div class="card-body">
+        <div class="bar-chart" style="height:110px">${qBars}</div>
+        <div style="display:flex;gap:2px;margin-top:6px">${['Q1','Q2','Q3','Q4 24','Q1','Q2','Q3','Q4 25'].map(l=>`<div style="flex:1;text-align:center;font-size:9px;color:var(--muted)">${l}</div>`).join('')}</div>
+        <div style="display:flex;gap:14px;margin-top:10px">
+          <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)"><div style="width:10px;height:10px;border-radius:2px;background:var(--forest)"></div>Shea (t)</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)"><div style="width:10px;height:10px;border-radius:2px;background:var(--gold)"></div>Premium txns</div>
+        </div>
+      </div>
+      <div class="card-head"><div><div class="card-title">Welfare Snapshot</div><div class="card-sub">Enrolled farmer households</div></div></div>
+      <div class="card-body">
+        <div class="welfare-grid">
+          <div class="welfare-item"><div class="welfare-icon">👨‍👩‍👧‍👦</div><div class="welfare-val">5.8</div><div class="welfare-label">Avg. household size</div></div>
+          <div class="welfare-item"><div class="welfare-icon">🎒</div><div class="welfare-val">74%</div><div class="welfare-label">Children in school</div></div>
+          <div class="welfare-item"><div class="welfare-icon">🌾</div><div class="welfare-val">3.1</div><div class="welfare-label">Food security score /5</div></div>
+          <div class="welfare-item"><div class="welfare-icon">📱</div><div class="welfare-val">68%</div><div class="welfare-label">Have basic mobile</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-head"><div><div class="card-title">Latest Transactions</div></div></div>
+      <div class="card-body" style="padding:0">
+        <table class="tbl">
+          <thead><tr><th>Farmer</th><th>Buyer</th><th>Tonnes</th><th>Premium</th></tr></thead>
+          <tbody>
+            ${[{f:'David Ongom',b:'NovaBotanica',t:'2.4t',p:'+20%'},{f:'Catherine Angwech',b:"L'Oréal Pilot",t:'1.8t',p:'+21%'},{f:'Margaret Akello',b:'NovaBotanica',t:'2.4t',p:'+20%'},{f:'Josphine Otto',b:'EuroBotanix',t:'2.0t',p:'+17%'},{f:'Rosket Nyeko',b:'Blessed Organics',t:'1.6t',p:'+10%'}].map(r=>`<tr><td style="font-weight:500">${r.f}</td><td style="color:var(--muted);font-size:11.5px">${r.b}</td><td class="mono">${r.t}</td><td><span class="badge badge-green">${r.p}</span></td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><div class="card-title">Platform Alerts</div></div></div>
+      <div class="card-body">
+        <div class="alert alert-warn">⚠ <div><strong>14 farmers pending EUDR documentation.</strong> GPS verification needed before April 30.</div></div>
+        <div class="alert alert-info">ℹ <div><strong>Unilever pilot — volume confirmation due.</strong> Q2 guarantee required to advance.</div></div>
+        <div class="alert alert-success">✓ <div><strong>L'Oréal LOI signed — audit April 12.</strong></div></div>
+        <div class="alert alert-warn">⚠ <div><strong>Otuke field officer overdue.</strong> Last sync: 6 weeks ago.</div></div>
+      </div>
+    </div>
+  </div>`;
+
+  // Map district click
+  setTimeout(()=>{
+    document.querySelectorAll('.d-poly').forEach(poly=>{
+      poly.addEventListener('click',()=>{farmerFilter=poly.dataset.d;navigate('farmers');});
+      poly.addEventListener('mousemove',e=>{showTip(e,poly.dataset.d+' District');});
+      poly.addEventListener('mouseleave',hideTip);
+    });
+  },100);
+}
+
+// ═══════════════════════════════════════════════════
+// FARMERS
+// ═══════════════════════════════════════════════════
+function renderFarmers(){
+  const pc=document.getElementById('pageContent');
+  document.getElementById('topActions').innerHTML=`<div class="search-wrap" style="width:190px"><svg width="13" height="13" fill="none" stroke="var(--muted)" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" id="fSearch" placeholder="Search farmer..." value="${farmerSearch}"></div><button class="btn btn-gold">+ Add Farmer</button><div class="notif-btn" id="notifBtn"><svg width="16" height="16" fill="none" stroke="var(--charcoal)" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="notif-dot"></div></div>`;
+  const filtered=FARMERS.filter(f=>{const md=farmerFilter==='all'||f.district===farmerFilter;const q=farmerSearch.toLowerCase();const ms=!q||f.name.toLowerCase().includes(q)||f.coop.toLowerCase().includes(q)||f.id.toLowerCase().includes(q);return md&&ms;});
+  const totalP=Math.ceil(filtered.length/perPage);
+  if(farmerPage>totalP)farmerPage=1;
+  const slice=filtered.slice((farmerPage-1)*perPage,farmerPage*perPage);
+  const pills=['all','Pader','Lamwo','Agago','Kitgum','Otuke'].map(d=>`<span class="pill${farmerFilter===d?' active':''}" onclick="farmerFilter='${d}';farmerPage=1;renderFarmers()">${d==='all'?'All Districts':d}</span>`).join('');
+
+  const cards=slice.map((f,i)=>{
+    const delay=(i%6)*0.04;
+    const stamp=f.verified?`<span class="fc-vstamp v">✓ Verified</span>`:`<span class="fc-vstamp p">⟳ Pending</span>`;
+    const tags=f.tags.map(t=>`<span class="tag ${tagClass(t)}">${t}</span>`).join('');
+    return `<div class="fc" style="animation-delay:${delay}s" onclick="openFarmerModal('${f.id}')">
+      <div class="fc-head">
+        <div class="fc-portrait">${getPortrait(f.id)}</div>
+        <div style="flex:1"><div class="fc-name">${f.name}</div><div class="fc-id">${f.id}</div></div>
+        <span class="fc-dbadge">${f.district}</span>${stamp}
+      </div>
+      <div class="fc-body">
+        <div class="fc-stats">
+          <div class="fc-stat"><div class="fc-stat-l">Land</div><div class="fc-stat-v">${f.acres}<span class="fc-stat-u">ac</span></div></div>
+          <div class="fc-stat"><div class="fc-stat-l">Trees</div><div class="fc-stat-v">${f.trees}</div></div>
+          <div class="fc-stat"><div class="fc-stat-l">Yield</div><div class="fc-stat-v">${f.yield}<span class="fc-stat-u">t</span></div></div>
+          <div class="fc-stat"><div class="fc-stat-l">Score</div><div class="fc-stat-v" style="color:${creditColor(f.creditScore)}">${f.creditScore}</div></div>
+        </div>
+        <div class="fc-welfare">
+          <span class="fc-welfare-item">👨‍👩‍👧‍👦 ${f.dependents} dep.</span>
+          <span class="fc-welfare-item">🎒 ${f.childrenInSchool} in school</span>
+          <span class="fc-welfare-item">🌾 ${f.foodSecurity}/5</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px">${tags}</div>
+      </div>
+      <div class="fc-foot"><div class="fc-coop"><strong>${f.coop.split(' ').slice(0,3).join(' ')}</strong></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px"><span class="credit-tier ${tierCls(f.creditTier)}" style="font-size:9px">${f.creditTier}</span><span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted)">${f.phone}</span></div></div>
+    </div>`;
+  }).join('');
+
+  const pagBtns=totalP<=1?'':(() => {
+    let h=`<button class="pag-btn" ${farmerPage===1?'disabled':''} onclick="farmerPage--;renderFarmers()">←</button>`;
+    for(let p=1;p<=totalP;p++) h+=`<button class="pag-btn${p===farmerPage?' active':''}" onclick="farmerPage=${p};renderFarmers()">${p}</button>`;
+    h+=`<button class="pag-btn" ${farmerPage===totalP?'disabled':''} onclick="farmerPage++;renderFarmers()">→</button>`;
+    return h;
+  })();
+
+  pc.innerHTML=`
+  <div class="stat-strip">
+    <div class="ss-item"><div class="ss-val">${FARMERS.length}</div><div class="ss-label">Total Farmers</div></div>
+    <div class="ss-item"><div class="ss-val">${FARMERS.filter(f=>f.verified).length}</div><div class="ss-label">Verified</div></div>
+    <div class="ss-item"><div class="ss-val">${FARMERS.filter(f=>f.creditScore>=720).length}</div><div class="ss-label">Prime Borrowers</div></div>
+    <div class="ss-item"><div class="ss-val">${FARMERS.reduce((a,f)=>a+f.dependents,0).toLocaleString()}</div><div class="ss-label">Total Dependents</div></div>
+    <div class="ss-item"><div class="ss-val">${FARMERS.filter(f=>f.tags.includes('EUDR Ready')).length}</div><div class="ss-label">EUDR Ready</div></div>
+  </div>
+  <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px">${pills}</div>
+  ${filtered.length===0?`<div style="text-align:center;padding:50px;color:var(--muted)"><div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--forest);margin-bottom:8px">No farmers found</div></div>`:`<div class="g3">${cards}</div>`}
+  <div class="pag">${pagBtns}</div>`;
+  setTimeout(()=>{const el=document.getElementById('fSearch');if(el)el.addEventListener('input',e=>{farmerSearch=e.target.value;farmerPage=1;renderFarmers();});},50);
+}
+
+// ═══════════════════════════════════════════════════
+// TRANSACTIONS & REVENUE
+// ═══════════════════════════════════════════════════
+function renderTransactions(){
+  const pc=document.getElementById('pageContent');
+  document.getElementById('topActions').innerHTML=`<button class="btn btn-outline">Export CSV</button><button class="btn btn-gold">Record Transaction</button><div class="notif-btn" id="notifBtn"><svg width="16" height="16" fill="none" stroke="var(--charcoal)" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="notif-dot"></div></div>`;
+
+  // Crop data: price per kg in UGX, tonnes traded
+  const CROPS=[
+    {name:'Shea Butter',emoji:'🌰',tonnes:281,pricePerKg:5040,color:'#1a3d2b',lightColor:'#e8f5e9',borderColor:'#a5d6a7',farmers:FARMERS.filter(f=>f.crop==='Shea').length,buyers:['NovaBotanica','EuroBotanix',"L'Oréal",'Blessed Organics','Kahangi Estates']},
+    {name:'Sunflower',emoji:'🌻',tonnes:19,pricePerKg:3800,color:'#c9923a',lightColor:'#fff8e1',borderColor:'#ffe082',farmers:FARMERS.filter(f=>f.crop==='Sunflower').length,buyers:['Kahangi Estates']},
+    {name:'Groundnuts',emoji:'🥜',tonnes:12,pricePerKg:4200,color:'#8b6347',lightColor:'#efebe9',borderColor:'#bcaaa4',farmers:FARMERS.filter(f=>f.crop==='Groundnuts').length,buyers:['Kahangi Estates','Blessed Organics']},
+  ];
+  const totalTonnes=CROPS.reduce((a,c)=>a+c.tonnes,0);
+  const totalFarmerRevenue=CROPS.reduce((a,c)=>a+c.tonnes*1000*c.pricePerKg,0);
+  const farmetricRevenue=Math.round(totalFarmerRevenue*0.08);
+  const farmerNetRevenue=totalFarmerRevenue-farmetricRevenue;
+  const fmtUGX=v=>{if(v>=1e9)return 'UGX '+(v/1e9).toFixed(2)+'B';if(v>=1e6)return 'UGX '+(v/1e6).toFixed(0)+'M';return 'UGX '+v.toLocaleString()};
+  const fmtUSD=v=>'$'+(v/3700).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+
+  // Individual transactions
+  const TXN_LIST=[
+    {id:'TXN-001',farmer:'David Ongom',crop:'Shea',buyer:'NovaBotanica GmbH',mt:2.4,priceKg:5040,date:'Mar 28 2025',status:'Settled'},
+    {id:'TXN-002',farmer:'Catherine Angwech',crop:'Shea',buyer:"L'Oréal Procurement",mt:1.8,priceKg:5100,date:'Mar 22 2025',status:'Settled'},
+    {id:'TXN-003',farmer:'Margaret Akello',crop:'Shea',buyer:'NovaBotanica GmbH',mt:2.4,priceKg:5040,date:'Mar 15 2025',status:'Settled'},
+    {id:'TXN-004',farmer:'Josphine Otto',crop:'Shea',buyer:'EuroBotanix SA',mt:2.0,priceKg:4900,date:'Mar 10 2025',status:'Settled'},
+    {id:'TXN-005',farmer:'David Ongom',crop:'Shea',buyer:'EuroBotanix SA',mt:2.6,priceKg:4900,date:'Feb 28 2025',status:'Settled'},
+    {id:'TXN-006',farmer:'Rosket Nyeko',crop:'Shea',buyer:'Blessed Organics LLC',mt:1.6,priceKg:4600,date:'Feb 20 2025',status:'Settled'},
+    {id:'TXN-007',farmer:'Christine Enume',crop:'Shea',buyer:'NovaBotanica GmbH',mt:1.7,priceKg:5040,date:'Feb 14 2025',status:'Settled'},
+    {id:'TXN-008',farmer:'Betty Lalam',crop:'Shea',buyer:'EuroBotanix SA',mt:1.5,priceKg:4900,date:'Feb 8 2025',status:'Settled'},
+    {id:'TXN-009',farmer:'David Ongom',crop:'Shea',buyer:'Kahangi Estates',mt:2.6,priceKg:4400,date:'Jan 30 2025',status:'Settled'},
+    {id:'TXN-010',farmer:'Margaret Akello',crop:'Shea',buyer:'Kahangi Estates',mt:1.8,priceKg:4400,date:'Jan 22 2025',status:'Settled'},
+    {id:'TXN-011',farmer:'Alfred Aluk',crop:'Sunflower',buyer:'Kahangi Estates',mt:1.4,priceKg:3800,date:'Jan 18 2025',status:'Settled'},
+    {id:'TXN-012',farmer:'Samuel Okello',crop:'Sunflower',buyer:'Kahangi Estates',mt:0.8,priceKg:3800,date:'Jan 10 2025',status:'Settled'},
+    {id:'TXN-013',farmer:'Paul Opira',crop:'Groundnuts',buyer:'Blessed Organics LLC',mt:1.2,priceKg:4200,date:'Jan 5 2025',status:'Settled'},
+    {id:'TXN-014',farmer:'Christine Enume',crop:'Shea',buyer:'NovaBotanica GmbH',mt:1.7,priceKg:5040,date:'Dec 28 2024',status:'Settled'},
+  ];
+
+  // Business model arc Y1/Y3/Y5
+  const MODEL=[
+    {yr:'Year 1 (2025)',rev:2.4,cost:18,fee:0.19,label:'Investment phase',note:'Platform fixed costs exceed early revenue — expected'},
+    {yr:'Year 2 (2026)',rev:18,cost:20,fee:1.44,label:'Growth phase',note:'Cooperatives fully onboarded, buyer pipeline converts'},
+    {yr:'Year 3 (2027)',rev:42,cost:22,fee:3.36,label:'Break-even',note:'534t threshold crossed — unit economics positive'},
+    {yr:'Year 4 (2028)',rev:98,cost:24,fee:7.84,label:'Scale',note:'Multi-crop expansion: sunflower, groundnuts, sesame'},
+    {yr:'Year 5 (2029)',rev:198,cost:28,fee:15.84,label:'Platform maturity',note:'Fixed costs flat; revenue scales linearly with volume'},
+  ];
+  const maxRev=Math.max(...MODEL.map(m=>m.rev));
+
+  pc.innerHTML=`
+  <!-- HEADLINE WIDGET: 4 key numbers -->
+  <div style="background:linear-gradient(135deg,var(--forest),#1f5038);border-radius:14px;padding:28px 32px;margin-bottom:20px">
+    <div style="font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:16px">Season 2025 — All Verified Transactions</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:1px;background:rgba(255,255,255,0.08);border-radius:10px;overflow:hidden">
+      ${[
+        {label:'Total Farmer Revenue',val:fmtUGX(totalFarmerRevenue),sub:fmtUSD(totalFarmerRevenue)+' USD equiv.',icon:'🌱'},
+        {label:'Farmetric Platform Revenue',val:fmtUGX(farmetricRevenue),sub:'8% of gross transaction value',icon:'📊'},
+        {label:'Total Goods Transferred',val:totalTonnes+' MT',sub:CROPS.map(c=>c.name.split(' ')[0]+': '+c.tonnes+'t').join(' · '),icon:'⚖️'},
+        {label:'Completed Transactions',val:TXN_LIST.filter(t=>t.status==='Settled').length,sub:'Avg. '+fmtUGX(Math.round(totalFarmerRevenue/TXN_LIST.length))+' per deal',icon:'✅'},
+      ].map(s=>`<div style="padding:20px 22px;background:rgba(255,255,255,0.04)">
+        <div style="font-size:22px;margin-bottom:8px">${s.icon}</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--gold-light);line-height:1;margin-bottom:5px">${s.val}</div>
+        <div style="font-size:10.5px;color:rgba(255,255,255,0.45);margin-bottom:3px">${s.label}</div>
+        <div style="font-size:9.5px;color:rgba(255,255,255,0.28)">${s.sub}</div>
+      </div>`).join('')}
+    </div>
+  </div>
+
+  <!-- CROP BREAKDOWN -->
+  <div class="card mb20">
+    <div class="card-head"><div><div class="card-title">Revenue by Crop Type</div><div class="card-sub">Gross farmer revenue · Farmetric 8% fee · Volume transferred</div></div></div>
+    <div class="card-body">
+      <div class="g3" style="margin-bottom:18px">
+        ${CROPS.map(c=>{
+          const gross=c.tonnes*1000*c.pricePerKg;
+          const fee=Math.round(gross*0.08);
+          const pct=Math.round((c.tonnes/totalTonnes)*100);
+          return `<div style="border:1.5px solid ${c.borderColor};border-radius:11px;padding:18px;background:${c.lightColor}">
+            <div style="font-size:28px;margin-bottom:8px">${c.emoji}</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:${c.color};margin-bottom:2px">${c.name}</div>
+            <div style="font-family:'DM Mono',monospace;font-size:11px;color:#555;margin-bottom:14px">${c.pricePerKg.toLocaleString()} UGX/kg · ${c.tonnes} MT · ${pct}% of volume</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+              <div style="background:white;border-radius:8px;padding:10px;border:1px solid ${c.borderColor}">
+                <div style="font-size:9.5px;color:#888;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Farmer Revenue</div>
+                <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:${c.color}">${fmtUGX(gross)}</div>
+                <div style="font-size:9.5px;color:#888;margin-top:2px">${fmtUSD(gross)}</div>
+              </div>
+              <div style="background:white;border-radius:8px;padding:10px;border:1px solid ${c.borderColor}">
+                <div style="font-size:9.5px;color:#888;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Farmetric Fee</div>
+                <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--forest)">${fmtUGX(fee)}</div>
+                <div style="font-size:9.5px;color:#888;margin-top:2px">${fmtUSD(fee)}</div>
+              </div>
+            </div>
+            <div style="margin-top:11px"><div style="font-size:9.5px;color:#888;margin-bottom:5px">Volume share</div><div class="prog-track"><div class="prog-fill" style="width:0;background:${c.color}" data-w="${pct}%"></div></div></div>
+            <div style="margin-top:9px;font-size:10px;color:#888">${c.farmers} enrolled farmers · Buyers: ${c.buyers.join(', ')}</div>
+          </div>`;
+        }).join('')}
+      </div>
+      <div style="background:var(--cream);border-radius:10px;padding:16px 20px;display:flex;gap:28px;align-items:center;flex-wrap:wrap">
+        <div><div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px">Total Gross (Farmers)</div><div style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--forest)">${fmtUGX(totalFarmerRevenue)}</div></div>
+        <div style="color:var(--cream-dark);font-size:22px">−</div>
+        <div><div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px">Farmetric Fee (8%)</div><div style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--gold)">${fmtUGX(farmetricRevenue)}</div></div>
+        <div style="color:var(--cream-dark);font-size:22px">=</div>
+        <div><div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px">Net to Farmers</div><div style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--success)">${fmtUGX(farmerNetRevenue)}</div></div>
+        <div style="margin-left:auto;text-align:right"><div style="font-size:9.5px;color:var(--muted);margin-bottom:3px">vs. informal market (UGX 4,200/kg avg)</div><div style="font-size:13px;font-weight:600;color:var(--success)">Farmers earn +20% more via Farmetric</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BUSINESS MODEL ARC -->
+  <div class="card mb20">
+    <div class="card-head"><div><div class="card-title">Business Model: Revenue vs. Cost Trajectory</div><div class="card-sub">Platform fixed costs stay flat while revenue scales with transaction volume — the core economics argument</div></div></div>
+    <div class="card-body">
+      <div style="margin-bottom:16px;padding:12px 16px;background:#e8f5e9;border-radius:8px;border:1px solid #a5d6a7;font-size:12.5px;color:#1b5e20"><strong>Headline:</strong> Break-even at 534 tonnes (Year 3). Fixed platform costs remain ~UGX 20–28M/yr while revenue grows linearly with volume. By Year 5, UGX 198M revenue against UGX 28M fixed base = 86% gross margin.</div>
+      ${MODEL.map((m,i)=>{
+        const revW=Math.round((m.rev/maxRev)*100);
+        const costW=Math.round((m.cost/maxRev)*100);
+        const profitable=m.rev>m.cost;
+        return `<div style="display:grid;grid-template-columns:130px 1fr 80px;gap:12px;align-items:center;margin-bottom:16px">
+          <div>
+            <div style="font-size:12px;font-weight:600;color:var(--charcoal)">${m.yr}</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:2px">${m.label}</div>
+          </div>
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+              <span style="font-size:9.5px;color:var(--muted);width:100px">Revenue (UGX M)</span>
+              <div style="flex:1;height:14px;background:var(--cream-dark);border-radius:4px;overflow:hidden">
+                <div style="height:100%;background:${profitable?'var(--forest)':'var(--bark)'};border-radius:4px;transition:width 1.2s ease;width:0" data-w="${revW}%" title="UGX ${m.rev}M"></div>
+              </div>
+              <span style="font-family:'DM Mono',monospace;font-size:10.5px;font-weight:600;color:${profitable?'var(--forest)':'var(--bark)'};width:36px">${m.rev}M</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:9.5px;color:var(--muted);width:100px">Fixed Costs (UGX M)</span>
+              <div style="flex:1;height:14px;background:var(--cream-dark);border-radius:4px;overflow:hidden">
+                <div style="height:100%;background:#e67e22;border-radius:4px;transition:width 1.2s ease;width:0" data-w="${costW}%" title="UGX ${m.cost}M"></div>
+              </div>
+              <span style="font-family:'DM Mono',monospace;font-size:10.5px;color:#e67e22;width:36px">${m.cost}M</span>
+            </div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:${profitable?'var(--success)':'var(--danger)'}">${profitable?'+':''}${(m.rev-m.cost).toFixed(1)}M</div>
+            <div style="font-size:9px;color:var(--muted)">${profitable?'surplus':'deficit'}</div>
+          </div>
+        </div>${i===2?`<div style="padding:8px 12px;background:#fff8e1;border-radius:6px;border:1px solid #ffe082;font-size:11px;color:#5d4000;margin-bottom:16px;display:flex;align-items:center;gap:8px">⚡ <strong>Break-even point</strong> — 534 metric tonnes of verified shea. Platform economics become positive from Year 3 onward.</div>`:''}`;
+      }).join('')}
+      <div style="display:flex;gap:16px;margin-top:6px;font-size:11px;color:var(--muted)">
+        <span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:5px;background:var(--forest);border-radius:2px;display:inline-block"></span>Platform Revenue (scales with volume)</span>
+        <span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:5px;background:#e67e22;border-radius:2px;display:inline-block"></span>Fixed Platform Costs (geomapping + SMS infra — stays flat)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRANSACTION LOG -->
+  <div class="card">
+    <div class="card-head"><div><div class="card-title">Transaction Log</div><div class="card-sub">All verified commodity transactions · Season 2025</div></div><span class="badge badge-green">${TXN_LIST.length} settled</span></div>
+    <div class="card-body" style="padding:0">
+      <table class="tbl">
+        <thead><tr><th>ID</th><th>Farmer</th><th>Crop</th><th>Buyer</th><th>Volume (MT)</th><th>Gross (UGX)</th><th>Farmetric Fee</th><th>Date</th><th>Status</th></tr></thead>
+        <tbody>
+          ${TXN_LIST.map(t=>{
+            const gross=t.mt*1000*t.priceKg;
+            const fee=Math.round(gross*0.08);
+            const cropIcon=t.crop==='Shea'?'🌰':t.crop==='Sunflower'?'🌻':'🥜';
+            return `<tr>
+              <td class="mono">${t.id}</td>
+              <td style="font-weight:500;cursor:pointer;color:var(--forest)" onclick="openFarmerModal('${FARMERS.find(f=>f.name===t.farmer)?.id||''}')">${t.farmer}</td>
+              <td>${cropIcon} ${t.crop}</td>
+              <td style="font-size:12px;color:var(--muted)">${t.buyer}</td>
+              <td class="mono">${t.mt}t</td>
+              <td class="mono">${fmtUGX(gross)}</td>
+              <td class="mono" style="color:var(--forest);font-weight:600">${fmtUGX(fee)}</td>
+              <td class="mono">${t.date}</td>
+              <td><span class="badge badge-green">${t.status}</span></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div style="padding:12px 18px;background:var(--cream);border-top:1px solid var(--cream-dark);display:flex;justify-content:flex-end;gap:24px">
+      <div style="text-align:right"><div style="font-size:9.5px;color:var(--muted)">Total volume</div><div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:600">${TXN_LIST.reduce((a,t)=>a+t.mt,0).toFixed(1)} MT</div></div>
+      <div style="text-align:right"><div style="font-size:9.5px;color:var(--muted)">Total farmer gross</div><div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:600;color:var(--forest)">${fmtUGX(TXN_LIST.reduce((a,t)=>a+t.mt*1000*t.priceKg,0))}</div></div>
+      <div style="text-align:right"><div style="font-size:9.5px;color:var(--muted)">Total Farmetric revenue</div><div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:600;color:var(--gold)">${fmtUGX(Math.round(TXN_LIST.reduce((a,t)=>a+t.mt*1000*t.priceKg,0)*0.08))}</div></div>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════
+// COOPERATIVES
+// ═══════════════════════════════════════════════════
+function renderCoops(){
+  document.getElementById('topActions').innerHTML=`<button class="btn btn-gold">+ Register Cooperative</button><div class="notif-btn" id="notifBtn"><svg width="16" height="16" fill="none" stroke="var(--charcoal)" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="notif-dot"></div></div>`;
+  const pc=document.getElementById('pageContent');
+  const cards=COOPS.map(c=>{const vPct=Math.round(c.verified/c.farmers*100);return `<div class="coop-card"><div class="coop-head"><div class="coop-name">${c.name}</div><div class="coop-district">${c.district} District · Est. ${c.established}</div></div><div class="coop-body"><div class="coop-row"><span class="coop-row-l">Field Officer</span><span class="coop-row-v">${c.officer}</span></div><div class="coop-row"><span class="coop-row-l">Farmers</span><span class="coop-row-v">${c.farmers}</span></div><div class="coop-row"><span class="coop-row-l">Verified</span><span class="coop-row-v">${c.verified} <span style="font-size:11px;color:var(--muted)">(${vPct}%)</span></span></div><div style="margin:7px 0 6px"><div class="prog-track"><div class="prog-fill${vPct<60?' red':''}" style="width:0" data-w="${vPct}%"></div></div></div><div class="coop-row"><span class="coop-row-l">Verified Tonnage</span><span class="coop-row-v">${c.tonnes}t</span></div><div class="coop-row"><span class="coop-row-l">Premium Txns</span><span class="coop-row-v">${c.premium}</span></div><div class="coop-row"><span class="coop-row-l">Est. Revenue</span><span class="coop-row-v" style="color:var(--forest)">${c.estRevenue}</span></div></div><div class="coop-foot">📞 ${c.phone}</div></div>`;}).join('');
+  pc.innerHTML=`<div class="stat-strip mb20"><div class="ss-item"><div class="ss-val">${COOPS.length}</div><div class="ss-label">Cooperatives</div></div><div class="ss-item"><div class="ss-val">${COOPS.reduce((a,c)=>a+c.farmers,0).toLocaleString()}</div><div class="ss-label">Total Farmers</div></div><div class="ss-item"><div class="ss-val">${COOPS.reduce((a,c)=>a+c.tonnes,0)}t</div><div class="ss-label">Verified Tonnage</div></div><div class="ss-item"><div class="ss-val">${COOPS.reduce((a,c)=>a+c.premium,0)}</div><div class="ss-label">Premium Txns</div></div></div><div class="g3">${cards}</div>`;
+}
+
+// ═══════════════════════════════════════════════════
+// PRODUCTION
+// ═══════════════════════════════════════════════════
+function renderProduction(){
+  const pc=document.getElementById('pageContent');
+  const qD=[{q:'Q1 24',v:22},{q:'Q2 24',v:38},{q:'Q3 24',v:54},{q:'Q4 24',v:41},{q:'Q1 25',v:31},{q:'Q2 25',v:52},{q:'Q3 25',v:78},{q:'Q4 25',v:65}];
+  const qM=Math.max(...qD.map(d=>d.v));
+  const qBars=qD.map(d=>`<div class="bc-group"><div style="font-family:'DM Mono',monospace;font-size:8.5px;color:var(--muted);margin-bottom:2px">${d.v}t</div><div class="bc-bar g" style="height:0" data-h="${Math.round(d.v/qM*100)}" data-val="${d.v}t"></div></div>`).join('');
+  pc.innerHTML=`<div class="g4 mb20"><div class="mc green"><div class="mc-val">312t</div><div class="mc-label">Total 2025 Production</div><div class="mc-delta">↑ 31%</div></div><div class="mc gold"><div class="mc-val">8%</div><div class="mc-label">Platform Fee Rate</div><div class="mc-delta">UGX 24.9M earned</div></div><div class="mc bark"><div class="mc-val">1.25t</div><div class="mc-label">Average Yield / Farmer</div><div class="mc-delta">↑ from 0.9t</div></div><div class="mc teal"><div class="mc-val">534t</div><div class="mc-label">Break-even Target Y3</div><div class="mc-delta warn">58% reached</div></div></div>
+  <div class="g14 mb20">
+    <div class="card"><div class="card-head"><div><div class="card-title">Output by District</div></div></div><div class="card-body">${[{d:'Pader',v:89,w:78},{d:'Agago',v:74,w:61},{d:'Kitgum',v:66,w:52},{d:'Lamwo',v:61,w:43},{d:'Otuke',v:31,w:28}].map(d=>`<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><span style="width:50px;font-size:12px;font-weight:500">${d.d}</span><div class="prog-track" style="flex:1"><div class="prog-fill" style="width:0" data-w="${d.w}%"></div></div><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);width:34px;text-align:right">${d.v}t</span></div>`).join('')}
+    <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--cream-dark)"><div style="font-size:11px;color:var(--muted);margin-bottom:8px;font-weight:500">Crop mix 2025</div><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="badge badge-green">Shea · 281t</span><span class="badge badge-gold">Sunflower (pilot) · 19t</span><span class="badge badge-blue">Groundnuts (pilot) · 12t</span></div></div></div></div>
+    <div class="card"><div class="card-head"><div><div class="card-title">Quarterly Trend</div></div></div><div class="card-body"><div class="bar-chart" style="height:120px">${qBars}</div><div style="display:flex;gap:2px;margin-top:6px">${qD.map(d=>`<div style="flex:1;text-align:center;font-size:8.5px;color:var(--muted)">${d.q}</div>`).join('')}</div></div></div>
+  </div>
+  <div class="g2"><div class="card"><div class="card-head"><div><div class="card-title">Yield Distribution</div></div></div><div class="card-body">${[{l:'< 0.5t',n:84,pct:7},{l:'0.5–1.0t',n:312,pct:25},{l:'1.0–1.5t',n:498,pct:40},{l:'1.5–2.5t',n:274,pct:22},{l:'> 2.5t',n:79,pct:6}].map(r=>`<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><span style="width:80px;font-size:12px">${r.l}</span><div class="prog-track" style="flex:1"><div class="prog-fill gold" style="width:0" data-w="${r.pct*2}%"></div></div><span style="font-size:11px;color:var(--muted);width:66px;text-align:right">${r.n} farmers</span></div>`).join('')}</div></div>
+  <div class="card"><div class="card-head"><div><div class="card-title">Revenue Model</div></div></div><div class="card-body"><div style="display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:14px">${[{l:'Informal market',v:'UGX 4,200/kg'},{l:'Premium verified',v:'UGX 5,040/kg'},{l:'Platform fee (8%)',v:'UGX 403/kg'},{l:'Net farmer premium',v:'UGX 437/kg'},{l:'Y1 revenue est.',v:'UGX 2.4M'},{l:'Y3 break-even',v:'534 tonnes'},{l:'Y5 projected revenue',v:'UGX 198M'},{l:'Fixed cost base',v:'UGX 18M/yr'}].map(r=>`<div><div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px">${r.l}</div><div style="font-size:13.5px;font-weight:600;color:var(--forest)">${r.v}</div></div>`).join('')}</div><div class="alert alert-info">ℹ Logistics cost from Pader to Kampala being quantified — pilot shipment quote expected Q2.</div></div></div></div>`;
+}
+
+// ═══════════════════════════════════════════════════
+// CARBON
+// ═══════════════════════════════════════════════════
+function renderCarbon(){
+  const pc=document.getElementById('pageContent');
+  pc.innerHTML=`<div class="g4 mb20"><div class="mc teal"><div class="mc-val cu" data-t="48291">0</div><div class="mc-label">Trees Enrolled</div><div class="mc-delta">Across 891 farmers</div></div><div class="mc green"><div class="mc-val">4,829</div><div class="mc-label">Potential Credits (Y3)</div><div class="mc-delta info">tCO₂e projected</div></div><div class="mc gold"><div class="mc-val">$12</div><div class="mc-label">Est. Credit Price (VCM)</div><div class="mc-delta warn">Range $8–$18</div></div><div class="mc bark"><div class="mc-val">UGX 2.3B</div><div class="mc-label">Projected Revenue Y3</div><div class="mc-delta info">Carbon + transactions</div></div></div>
+  <div class="alert alert-warn mb20">⚠ <div><strong>Government MOU pending formal signature.</strong> Ugandan Ministry of Water & Environment verbal commitment secured. Written agreement in drafting — expected Q2 2025.</div></div>
+  <div class="g14 mb20"><div class="card"><div class="card-head"><div><div class="card-title">Methodology Status</div></div></div><div class="card-body">${[{step:'Farmer tree census',status:'Complete',cls:'badge-green'},{step:'GPS plot mapping',status:'71% complete',cls:'badge-gold'},{step:'Baseline biomass assessment',status:'In Progress',cls:'badge-gold'},{step:'Government MOU signing',status:'Pending',cls:'badge-red'},{step:'VCS/Gold Standard registration',status:'Not started',cls:'badge-grey'},{step:'First verification cycle',status:'Year 3 target',cls:'badge-grey'}].map(r=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--cream-dark)"><span style="font-size:13px">${r.step}</span><span class="badge ${r.cls}">${r.status}</span></div>`).join('')}</div></div>
+  <div class="card"><div class="card-head"><div><div class="card-title">Carbon Projection (Base Scenario)</div></div></div><div class="card-body">${[{yr:'Year 1 (2025)',c:'—',b:'—',note:'Baseline year'},{yr:'Year 2 (2026)',c:'620',b:'980',note:'Partial sampling'},{yr:'Year 3 (2027)',c:'1,890',b:'2,780',note:'First issuance'},{yr:'Year 4 (2028)',c:'2,940',b:'4,120',note:'2 districts'},{yr:'Year 5 (2029)',c:'4,800',b:'6,900',note:'Full region'}].map(r=>`<div style="display:grid;grid-template-columns:1fr .5fr .5fr 1fr;gap:6px;align-items:center;padding:7px 0;border-bottom:1px solid var(--cream-dark);font-size:12px"><span style="font-weight:500">${r.yr}</span><span style="font-family:'DM Mono',monospace;text-align:center;color:var(--muted)">${r.c}</span><span style="font-family:'DM Mono',monospace;text-align:center;color:var(--forest);font-weight:600">${r.b}</span><span style="font-size:10.5px;color:var(--muted)">${r.note}</span></div>`).join('')}<div style="display:grid;grid-template-columns:1fr .5fr .5fr 1fr;margin-top:6px"><span></span><span style="font-size:9.5px;color:var(--muted);text-align:center">Conservative</span><span style="font-size:9.5px;color:var(--forest);text-align:center;font-weight:600">Base</span><span></span></div></div></div></div>
+  <div class="card"><div class="card-head"><div><div class="card-title">Carbon-Enrolled Farmers</div></div></div><div class="card-body" style="padding:0"><table class="tbl"><thead><tr><th>Farmer</th><th>District</th><th>Trees</th><th>Est. tCO₂e/yr</th><th>GPS</th><th>Status</th></tr></thead><tbody>${FARMERS.filter(f=>f.tags.includes('Carbon')).map(f=>`<tr><td style="font-weight:500;cursor:pointer;color:var(--forest)" onclick="openFarmerModal('${f.id}')">${f.name}</td><td class="mono">${f.district}</td><td class="mono">${f.trees}</td><td class="mono">${(f.trees*0.08).toFixed(1)}</td><td>${f.gps!=='Pending'?`<span class="badge badge-green">✓</span>`:`<span class="badge badge-red">✗</span>`}</td><td><span class="badge badge-blue">Enrolled</span></td></tr>`).join('')}</tbody></table></div></div>`;
+}
+
+// ═══════════════════════════════════════════════════
+// MARKET ACCESS
+// ═══════════════════════════════════════════════════
+function renderMarket(){
+  const pc=document.getElementById('pageContent');
+  pc.innerHTML=`<div class="g4 mb20"><div class="mc green"><div class="mc-val">6</div><div class="mc-label">Active Buyer Partners</div><div class="mc-delta">↑ 2 in pipeline</div></div><div class="mc gold"><div class="mc-val">UGX 5,040</div><div class="mc-label">Highest Price/kg</div><div class="mc-delta">+20% vs informal</div></div><div class="mc teal"><div class="mc-val">14</div><div class="mc-label">Completed Txns</div><div class="mc-delta">UGX 337M total</div></div><div class="mc bark"><div class="mc-val">65t</div><div class="mc-label">Unilever Pilot Target</div><div class="mc-delta warn">Pending guarantee</div></div></div>
+  <div class="g2 mb20">
+    <div class="card"><div class="card-head"><div><div class="card-title">Pipeline Status</div></div></div><div class="card-body" style="padding:0"><table class="tbl"><thead><tr><th>Buyer</th><th>Volume</th><th>Price/kg</th><th>Stage</th></tr></thead><tbody>${BUYERS.map(b=>`<tr><td style="font-weight:500">${b.name}</td><td class="mono">${b.volume}</td><td class="mono">${b.price}</td><td>${b.status==='Active Partner'?`<span class="badge badge-green">${b.status}</span>`:b.status==='LOI Signed'?`<span class="badge badge-teal">${b.status}</span>`:b.status==='Pilot Negotiation'?`<span class="badge badge-gold">${b.status}</span>`:`<span class="badge badge-grey">${b.status}</span>`}</td></tr>`).join('')}</tbody></table></div></div>
+    <div class="card"><div class="card-head"><div><div class="card-title">Price Trend</div><div class="card-sub">UGX/kg — informal vs. verified</div></div></div><div class="card-body">${[{m:'Oct 24',inf:3900,prem:4680},{m:'Nov 24',inf:4000,prem:4800},{m:'Dec 24',inf:4100,prem:4920},{m:'Jan 25',inf:4050,prem:4900},{m:'Feb 25',inf:4150,prem:5000},{m:'Mar 25',inf:4200,prem:5040}].map(r=>{const p=Math.round((r.inf/5040)*88),pp=Math.round((r.prem/5040)*88);return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:9px"><span style="width:40px;font-size:10px;color:var(--muted)">${r.m}</span><div style="flex:1"><div style="display:flex;align-items:center;gap:4px;margin-bottom:3px"><div style="height:5px;background:var(--cream-dark);flex:1;border-radius:3px;overflow:hidden"><div style="height:100%;width:${p}%;background:var(--bark)"></div></div><span style="font-family:'DM Mono',monospace;font-size:9.5px;color:var(--muted);width:68px">${r.inf.toLocaleString()}/kg</span></div><div style="display:flex;align-items:center;gap:4px"><div style="height:5px;background:var(--cream-dark);flex:1;border-radius:3px;overflow:hidden"><div style="height:100%;width:${pp}%;background:var(--forest-light)"></div></div><span style="font-family:'DM Mono',monospace;font-size:9.5px;color:var(--forest);width:68px;font-weight:600">${r.prem.toLocaleString()}/kg</span></div></div></div>`;}).join('')}<div style="display:flex;gap:14px;margin-top:10px;font-size:11px"><span style="display:flex;align-items:center;gap:5px;color:var(--muted)"><span style="width:10px;height:4px;background:var(--bark);border-radius:2px;display:inline-block"></span>Informal</span><span style="display:flex;align-items:center;gap:5px;color:var(--forest);font-weight:500"><span style="width:10px;height:4px;background:var(--forest-light);border-radius:2px;display:inline-block"></span>Farmetric verified</span></div></div></div>
+  </div>
+  <div class="card"><div class="card-head"><div><div class="card-title">Buyer Requirements Matrix</div></div></div><div class="card-body" style="padding:0;overflow-x:auto"><table class="tbl"><thead><tr><th>Requirement</th>${BUYERS.map(b=>`<th>${b.name.split(' ')[0]}</th>`).join('')}</tr></thead><tbody>${['EUDR verified origin','GPS traceability','Organic certification','Third-party audit','Volume guarantee','ESG impact report','Women-farmer sourcing'].map(req=>{const ticks=BUYERS.map(b=>b.requirements.some(r=>r.toLowerCase().includes(req.toLowerCase().split(' ')[0]))?'✓':'—');return `<tr><td style="font-size:12.5px">${req}</td>${ticks.map(t=>`<td style="text-align:center;color:${t==='✓'?'var(--success)':'var(--cream-dark)'};font-weight:700;font-size:16px">${t}</td>`).join('')}</tr>`;}).join('')}</tbody></table></div></div>`;
+}
+
+// ═══════════════════════════════════════════════════
+// EUDR
+// ═══════════════════════════════════════════════════
+function renderEUDR(){
+  const pc=document.getElementById('pageContent');
+  const eudrF=FARMERS.map(f=>({...f,eudrStatus:f.tags.includes('EUDR Ready')?'Compliant':f.verified?'In Progress':'Pending',gpsOK:f.gps!=='Pending'}));
+  const comp=eudrF.filter(f=>f.eudrStatus==='Compliant').length,inprog=eudrF.filter(f=>f.eudrStatus==='In Progress').length,pend=eudrF.filter(f=>f.eudrStatus==='Pending').length;
+  pc.innerHTML=`<div class="alert alert-info mb20">ℹ <div><strong>EUDR enforcement deadline: December 2025.</strong> All shea supplied to EU buyers must have verified deforestation-free origin. ${comp}/${FARMERS.length} enrolled farmers currently compliant.</div></div>
+  <div class="g4 mb20"><div class="mc green"><div class="mc-val">${comp}</div><div class="mc-label">EUDR Compliant</div><div class="mc-delta">${Math.round(comp/FARMERS.length*100)}%</div></div><div class="mc gold"><div class="mc-val">${inprog}</div><div class="mc-label">In Progress</div><div class="mc-delta warn">GPS pending</div></div><div class="mc red"><div class="mc-val">${pend}</div><div class="mc-label">Not Started</div><div class="mc-delta warn">Action needed</div></div><div class="mc teal"><div class="mc-val">4</div><div class="mc-label">Buyer Reports Issued</div><div class="mc-delta">Q1 2025</div></div></div>
+  <div class="g14 mb20"><div class="card"><div class="card-head"><div><div class="card-title">Compliance Checklist</div></div></div><div class="card-body">${[{item:'GPS plot mapping',done:comp+inprog,total:FARMERS.length},{item:'Identity verification',done:FARMERS.filter(f=>f.verified).length,total:FARMERS.length},{item:'No deforestation declaration',done:comp,total:FARMERS.length},{item:'Cooperative membership proof',done:FARMERS.length,total:FARMERS.length},{item:'Yield records (2 seasons)',done:Math.round(FARMERS.length*.58),total:FARMERS.length},{item:'Third-party audit sample',done:Math.round(comp*.3),total:comp}].map(r=>{const pct=Math.round(r.done/r.total*100);return `<div style="margin-bottom:13px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px"><span style="font-size:12.5px">${r.item}</span><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)">${r.done}/${r.total}</span></div><div class="prog-track"><div class="prog-fill${pct<50?' red':pct<80?' gold':''}" style="width:0" data-w="${pct}%"></div></div></div>`;}).join('')}</div></div>
+  <div class="card"><div class="card-head"><div><div class="card-title">Farmer Compliance Status</div></div></div><div class="card-body" style="padding:8px 16px;max-height:380px;overflow-y:auto">${eudrF.map(f=>{const sc=f.eudrStatus==='Compliant'?'dot-g':f.eudrStatus==='In Progress'?'dot-o':'dot-r';return `<div class="comp-row"><div style="width:36px;height:36px;border-radius:50%;overflow:hidden;flex-shrink:0">${getPortrait(f.id)}</div><div style="flex:1;margin-left:8px"><div style="font-size:13px;font-weight:500;cursor:pointer;color:var(--forest)" onclick="openFarmerModal('${f.id}')">${f.name}</div><div style="font-size:10.5px;color:var(--muted)">${f.district}</div></div><div style="display:flex;gap:5px;align-items:center">${f.gpsOK?`<span class="badge badge-green" style="font-size:9.5px">GPS ✓</span>`:`<span class="badge badge-red" style="font-size:9.5px">GPS ✗</span>`}${f.verified?`<span class="badge badge-green" style="font-size:9.5px">ID ✓</span>`:`<span class="badge badge-red" style="font-size:9.5px">ID ✗</span>`}</div><div style="display:flex;align-items:center;gap:5px;margin-left:8px"><div class="status-dot ${sc}"></div><span style="font-size:11px;color:var(--muted)">${f.eudrStatus}</span></div></div>`;}).join('')}</div></div></div>
+  <div class="card"><div class="card-head"><div><div class="card-title">Issued Buyer Reports</div></div></div><div class="card-body" style="padding:0"><table class="tbl"><thead><tr><th>Buyer</th><th>Type</th><th>Farmers</th><th>Tonnage</th><th>Issued</th><th>Status</th></tr></thead><tbody>${[{b:'NovaBotanica GmbH',t:'EUDR Origin Report',f:12,ton:'2.4t',d:'Mar 2025',s:'Accepted'},{b:'EuroBotanix SA',t:'Sustainability Cert.',f:8,ton:'1.8t',d:'Feb 2025',s:'Accepted'},{b:"L'Oréal Procurement",t:'Audit Pre-Report',f:24,ton:'—',d:'Mar 2025',s:'Under Review'},{b:'Blessed Organics LLC',t:'Organic Trace Report',f:6,ton:'1.0t',d:'Jan 2025',s:'Accepted'}].map(r=>`<tr><td style="font-weight:500">${r.b}</td><td style="font-size:12px;color:var(--muted)">${r.t}</td><td class="mono">${r.f}</td><td class="mono">${r.ton}</td><td class="mono">${r.d}</td><td><span class="badge ${r.s==='Accepted'?'badge-green':'badge-gold'}">${r.s}</span></td></tr>`).join('')}</tbody></table></div></div>`;
+}
+
+// ═══════════════════════════════════════════════════
+// AUDIT
+// ═══════════════════════════════════════════════════
+function renderAudit(){
+  const pc=document.getElementById('pageContent');
+  pc.innerHTML=`<div class="g4 mb20"><div class="mc green"><div class="mc-val">891</div><div class="mc-label">Profiles Verified</div><div class="mc-delta">This season</div></div><div class="mc gold"><div class="mc-val">356</div><div class="mc-label">Pending Verification</div><div class="mc-delta warn">45-day SLA</div></div><div class="mc bark"><div class="mc-val">8</div><div class="mc-label">Field Officers Active</div><div class="mc-delta">5 districts</div></div><div class="mc teal"><div class="mc-val">2,841</div><div class="mc-label">SMS Collections</div><div class="mc-delta">Q1 2025</div></div></div>
+  <div class="g2 mb20"><div class="card"><div class="card-head"><div><div class="card-title">Officer Activity</div><div class="card-sub">Last 14 days</div></div></div><div class="card-body" style="padding:0">${[{officer:'Leonora Abalo',district:'Pader',verified:31,sms:124,last:'Today',ok:true},{officer:'Ongom Charles',district:'Agago',verified:22,sms:98,last:'Yesterday',ok:true},{officer:'Cavine Pinyoloya',district:'Lamwo',verified:18,sms:87,last:'2 days ago',ok:true},{officer:'Odyek Charles',district:'Kitgum',verified:15,sms:71,last:'3 days ago',ok:true},{officer:'Aaba Ambrose',district:'Otuke',verified:6,sms:28,last:'6 weeks ago',ok:false},{officer:'Okot Richard Aoyo',district:'Lamwo',verified:10,sms:44,last:'4 days ago',ok:true}].map(o=>`<div style="display:flex;align-items:center;gap:12px;padding:11px 18px;border-bottom:1px solid var(--cream-dark)"><div class="${o.ok?'dot-g':'dot-r'} status-dot" style="margin-top:1px"></div><div style="flex:1"><div style="font-size:13px;font-weight:500">${o.officer}</div><div style="font-size:11px;color:var(--muted)">${o.district} · Last: ${o.last}</div></div><div style="text-align:center;min-width:42px"><div style="font-family:'DM Mono',monospace;font-size:14px;font-weight:600;color:var(--forest)">${o.verified}</div><div style="font-size:9.5px;color:var(--muted)">verified</div></div><div style="text-align:center;min-width:42px"><div style="font-family:'DM Mono',monospace;font-size:14px;font-weight:600;color:var(--gold)">${o.sms}</div><div style="font-size:9.5px;color:var(--muted)">SMS</div></div></div>`).join('')}</div></div>
+  <div class="card"><div class="card-head"><div><div class="card-title">Audit Timeline</div></div></div><div class="card-body"><div class="timeline">${[{d:'Apr 3, 2025',e:'David Ongom (FMT-012) — GPS mapped. EUDR complete.'},{d:'Apr 2, 2025',e:'Bulk SMS — 44 Lamwo farmers. Officer: Cavine Pinyoloya.'},{d:'Apr 1, 2025',e:'Catherine Angwech (FMT-004) — Organic certification confirmed.'},{d:'Mar 29, 2025',e:"NovaBotanica EUDR report issued and accepted. 12 farms, 2.4t."},{d:'Mar 27, 2025',e:'⚠ FLAG: Otuke — 3 farmers pending re-verification. Officer not reachable 6 weeks.'},{d:'Mar 25, 2025',e:"Margaret Akello (FMT-001) — Premium transaction. UGX 9.1M."},{d:'Mar 20, 2025',e:"L'Oréal LOI signed. Audit scheduled April 12."},{d:'Mar 15, 2025',e:"GPS batch upload — 18 Pader farmers. Officer: Leonora Abalo."}].map(e=>`<div class="tl-item"><div class="tl-date">${e.d}</div><div class="tl-event">${e.e}</div></div>`).join('')}</div></div></div></div>
+  <div class="card"><div class="card-head"><div><div class="card-title">Pending Verifications</div></div></div><div class="card-body" style="padding:0"><table class="tbl"><thead><tr><th>Farmer</th><th>District</th><th>Days Waiting</th><th>Priority</th><th>Action</th></tr></thead><tbody>${FARMERS.filter(f=>!f.verified||f.tags.includes('Pending EUDR')).map(f=>{const days=f.verified?Math.floor(Math.random()*30+10):Math.floor(Math.random()*60+20);const pri=days>45?'High':days>25?'Medium':'Low';const pc2=pri==='High'?'badge-red':pri==='Medium'?'badge-gold':'badge-blue';return `<tr><td style="display:flex;align-items:center;gap:8px;font-weight:500;cursor:pointer;color:var(--forest)" onclick="openFarmerModal('${f.id}')"><div style="width:28px;height:28px;border-radius:50%;overflow:hidden">${getPortrait(f.id)}</div>${f.name}</td><td class="mono">${f.district}</td><td class="mono">${days} days</td><td><span class="badge ${pc2}">${pri}</span></td><td><a class="tbl-action">Assign →</a></td></tr>`;}).join('')}</tbody></table></div></div>`;
+}
+
+// ═══════════════════════════════════════════════════
+// PARTNERSHIPS
+// ═══════════════════════════════════════════════════
+function renderPartnerships(){
+  const pc=document.getElementById('pageContent');
+  const cards=BUYERS.map(b=>{const sC=b.status==='Active Partner'?'badge-green':b.status==='LOI Signed'?'badge-teal':b.status==='Pilot Negotiation'?'badge-gold':'badge-grey';const eC=b.eudr==='Compliant'?'badge-green':b.eudr==='In Process'?'badge-gold':'badge-grey';return `<div class="buyer-card"><div class="buyer-head"><div class="buyer-logo" style="background:${b.logoColor};font-size:18px">${b.logo}</div><div><div class="buyer-name">${b.name}</div><div class="buyer-type">${b.type} · ${b.country}</div><div style="display:flex;gap:5px;margin-top:6px"><span class="badge ${sC}">${b.status}</span><span class="badge ${eC}">EUDR: ${b.eudr}</span></div></div></div><div class="buyer-body"><div class="buyer-stat-row"><div class="bs-item"><div class="bs-val">${b.volume}</div><div class="bs-label">Target Volume</div></div><div class="bs-item"><div class="bs-val">${b.premium}</div><div class="bs-label">Premium</div></div><div class="bs-item"><div class="bs-val">${b.deals}</div><div class="bs-label">Deals Done</div></div></div><div style="font-size:12px;color:var(--charcoal);line-height:1.6;margin-bottom:11px">${b.desc}</div><div style="display:flex;flex-wrap:wrap;gap:4px">${b.requirements.map(r=>`<span class="badge badge-blue" style="font-size:10px">${r}</span>`).join('')}</div></div><div class="buyer-foot"><div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Contact</div><div style="font-size:12.5px;font-weight:500">${b.contact}</div></div><div style="text-align:right"><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Value</div><div style="font-size:14px;font-weight:700;color:var(--forest)">${b.value}</div></div></div></div>`;}).join('');
+  pc.innerHTML=`<div class="stat-strip mb20"><div class="ss-item"><div class="ss-val">${BUYERS.length}</div><div class="ss-label">Total Buyers</div></div><div class="ss-item"><div class="ss-val">${BUYERS.filter(b=>b.status==='Active Partner').length}</div><div class="ss-label">Active</div></div><div class="ss-item"><div class="ss-val">${BUYERS.filter(b=>b.status==='LOI Signed'||b.status==='Pilot Negotiation').length}</div><div class="ss-label">In Pipeline</div></div><div class="ss-item"><div class="ss-val">UGX 337M</div><div class="ss-label">Transacted</div></div><div class="ss-item"><div class="ss-val">19.5%</div><div class="ss-label">Avg Premium</div></div></div><div class="g2">${cards}</div>`;
+}
+
+// ═══════════════════════════════════════════════════
+// IMPACT HUB
+// ═══════════════════════════════════════════════════
+function renderImpact(){
+  const pc=document.getElementById('pageContent');
+  document.getElementById('topActions').innerHTML=`<button class="btn btn-outline">Download Impact Brief</button><button class="btn btn-gold">Share with Investor</button><div class="notif-btn" id="notifBtn"><svg width="16" height="16" fill="none" stroke="var(--charcoal)" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="notif-dot"></div></div>`;
+
+  const tocBad=`<div style="display:flex;align-items:stretch;gap:4px;margin-bottom:6px">
+    ${[{icon:'📋',label:'No Records',desc:'Farmer has no verifiable identity, land or production data',bad:true},{arrow:'→'},{icon:'🚫',label:'No Market Access',desc:'Cannot access premium buyers without traceable data',bad:true},{arrow:'→'},{icon:'🪓',label:'Cuts Trees',desc:'Charcoal is the only fast cash available',bad:true},{arrow:'→'},{icon:'💔',label:'Deeper Poverty',desc:'Income falls, family cannot afford school or food',bad:true}].map(s=>{if(s.arrow)return `<div style="display:flex;align-items:center;padding:0 2px;color:var(--muted);font-size:16px">${s.arrow}</div>`;return `<div style="flex:1;background:#fce4ec;border:1px solid #f48fb1;border-radius:8px;padding:11px 10px;text-align:center"><div style="font-size:18px;margin-bottom:4px">${s.icon}</div><div style="font-size:10px;font-weight:700;color:#880e4f;letter-spacing:.04em;margin-bottom:3px">${s.label}</div><div style="font-size:9.5px;color:#ad1457;line-height:1.35">${s.desc}</div></div>`;}).join('')}
+  </div>`;
+  const tocGood=`<div style="display:flex;align-items:stretch;gap:4px">
+    ${[{icon:'🆔',label:'Farmetric Record',desc:'Verified identity, GPS land, production history',good:true},{arrow:'→'},{icon:'🌍',label:'Premium Market',desc:'Traceable shea reaches EUDR-compliant global buyers',good:true},{arrow:'→'},{icon:'🌳',label:'Trees Preserved',desc:'Living trees worth more than charcoal — cutting stops',good:true},{arrow:'→'},{icon:'📈',label:'Income Growth',desc:'20% price premium + credit access + carbon revenue',good:true}].map(s=>{if(s.arrow)return `<div style="display:flex;align-items:center;padding:0 2px;color:var(--muted);font-size:16px">${s.arrow}</div>`;return `<div style="flex:1;background:#e8f5e9;border:1px solid #a5d6a7;border-radius:8px;padding:11px 10px;text-align:center"><div style="font-size:18px;margin-bottom:4px">${s.icon}</div><div style="font-size:10px;font-weight:700;color:#1b5e20;letter-spacing:.04em;margin-bottom:3px">${s.label}</div><div style="font-size:9.5px;color:#2e7d32;line-height:1.35">${s.desc}</div></div>`;}).join('')}
+  </div>`;
+
+  // SDG data
+  const sdgs=[
+    {num:'SDG 1',name:'No Poverty',color:'#e5243b',metric:'1,247 farmers gaining formal income access',prog:68},
+    {num:'SDG 5',name:'Gender Equity',color:'#ff3a21',metric:'891 women with first economic identity',prog:82},
+    {num:'SDG 8',name:'Decent Work',color:'#a21942',metric:'20% income uplift via premium market',prog:55},
+    {num:'SDG 10',name:'Reduced Inequality',color:'#dd1367',metric:'Verified ID breaks exclusion cycle',prog:44},
+    {num:'SDG 13',name:'Climate Action',color:'#3f7e44',metric:'48,291 trees in carbon programme',prog:38},
+    {num:'SDG 15',name:'Life on Land',color:'#56c02b',metric:'Shea forest preserved vs. charcoal',prog:61},
+  ];
+
+  pc.innerHTML=`
+  <div class="impact-hero mb20">
+    <div class="ih-title">Impact Intelligence · Season 2025</div>
+    <div class="ih-headline">Every farmer record created<br>is a poverty cycle interrupted.</div>
+    <div class="ih-sub">Farmetric gives smallholder shea farmers in Northern Uganda a verifiable record of who they are, what they own, and what they produce — for the first time in their lives.</div>
+    <div class="ih-stats">
+      <div class="ih-stat"><div class="ih-stat-val cu" data-t="7233">0</div><div class="ih-stat-label">People impacted<br>(farmers + households)</div></div>
+      <div class="ih-stat"><div class="ih-stat-val cu" data-t="891">0</div><div class="ih-stat-label">Women with first<br>formal economic identity</div></div>
+      <div class="ih-stat"><div class="ih-stat-val cu" data-t="48291">0</div><div class="ih-stat-label">Shea trees enrolled<br>in carbon programme</div></div>
+      <div class="ih-stat"><div class="ih-stat-val">20%</div><div class="ih-stat-label">Average income<br>premium unlocked</div></div>
+    </div>
+  </div>
+
+  <div class="card mb20">
+    <div class="card-head"><div><div class="card-title">Theory of Change</div><div class="card-sub">The cycle Farmetric breaks — and the one it creates</div></div></div>
+    <div class="card-body">
+      <div style="font-size:10.5px;color:var(--danger);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Without Farmetric — the poverty cycle</div>
+      ${tocBad}
+      <div style="font-size:10.5px;color:var(--success);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin:14px 0 6px">With Farmetric — the virtuous cycle</div>
+      ${tocGood}
+    </div>
+  </div>
+
+  <div class="g2 mb20">
+    <div class="card">
+      <div class="card-head"><div><div class="card-title">SROI Calculator</div><div class="card-sub">For philanthropists & impact investors</div></div></div>
+      <div class="card-body">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Move the slider to see the impact of your investment</div>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px">
+          <span style="font-size:12px;color:var(--muted)">Investment</span>
+          <span id="sroiAmt" style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--forest);flex:1;text-align:right">$10,000</span>
+        </div>
+        <input type="range" class="sroi-slider" id="sroiSlider" min="1000" max="200000" value="10000" step="1000">
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:12px"><span>$1,000</span><span>$200,000</span></div>
+        <div class="sroi-result-grid">
+          <div class="sroi-result"><div class="sroi-result-val" id="sroiFarmers">114</div><div class="sroi-result-label">Farmers supported</div></div>
+          <div class="sroi-result"><div class="sroi-result-val" id="sroiDep">662</div><div class="sroi-result-label">Dependents impacted</div></div>
+          <div class="sroi-result"><div class="sroi-result-val" id="sroiIncome">$4,104</div><div class="sroi-result-label">Annual income unlocked</div></div>
+          <div class="sroi-result"><div class="sroi-result-val" id="sroiTrees">5,130</div><div class="sroi-result-label">Trees preserved</div></div>
+          <div class="sroi-result"><div class="sroi-result-val" id="sroiChildren">85</div><div class="sroi-result-label">Children kept in school</div></div>
+          <div class="sroi-result"><div class="sroi-result-val" id="sroiRatio">2.4×</div><div class="sroi-result-label">SROI ratio</div></div>
+        </div>
+        <div style="margin-top:12px;font-size:10.5px;color:var(--muted);font-style:italic;line-height:1.5">Based on: $88/farmer platform cost, 5.8 avg. household, 20% income premium on UGX 180K baseline, 45 trees/farmer, 74% school retention rate. SROI = total social value / investment.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div><div class="card-title">Welfare Progression</div><div class="card-sub">Enrolled farmer cohort — before vs. after platform</div></div></div>
+      <div class="card-body">
+        ${[
+          {metric:'Avg. seasonal income (UGX)',before:'180,000',after:'216,000',change:'+20%',cls:'badge-green'},
+          {metric:'% with formal market access',before:'8%',after:'71%',change:'+63pp',cls:'badge-green'},
+          {metric:'% with verified land record',before:'0%',after:'71%',change:'+71pp',cls:'badge-green'},
+          {metric:'Children in school rate',before:'61%',after:'74%',change:'+13pp',cls:'badge-green'},
+          {metric:'Food security score /5',before:'2.3',after:'3.1',change:'+0.8',cls:'badge-green'},
+          {metric:'Trees cut for charcoal (est.)',before:'~12/yr',after:'~3/yr',change:'−75%',cls:'badge-teal'},
+          {metric:'Farmers with credit access',before:'0',after:'${FARMERS.filter(f=>f.creditScore>=450).length}',change:'+${FARMERS.filter(f=>f.creditScore>=450).length}',cls:'badge-blue'},
+        ].map(r=>`<div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:6px;align-items:center;padding:8px 0;border-bottom:1px solid var(--cream-dark);font-size:12px">
+          <span style="font-weight:500">${r.metric}</span>
+          <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);text-align:center">${r.before}</span>
+          <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--forest);font-weight:600;text-align:center">${r.after}</span>
+          <span class="badge ${r.cls}" style="justify-content:center">${r.change}</span>
+        </div>`).join('')}
+        <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:6px;margin-top:6px;font-size:9.5px;color:var(--muted)"><span></span><span style="text-align:center">Before</span><span style="text-align:center">After</span><span style="text-align:center">Change</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mb20">
+    <div class="card-head"><div><div class="card-title">SDG Alignment</div><div class="card-sub">Primary sustainable development goal contributions</div></div></div>
+    <div class="card-body">
+      <div class="sdg-grid">
+        ${sdgs.map(s=>`<div class="sdg-card" style="background:${s.color}15;border-color:${s.color}44">
+          <div class="sdg-num" style="color:${s.color}">${s.num}</div>
+          <div class="sdg-name" style="color:${s.color}dd">${s.name}</div>
+          <div class="prog-track" style="margin-bottom:6px"><div class="prog-fill" style="width:0;background:${s.color}" data-w="${s.prog}%"></div></div>
+          <div class="sdg-metric" style="color:${s.color}bb">${s.metric}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="card-head"><div><div class="card-title">Cost Efficiency</div><div class="card-sub">Farmetric vs. comparable interventions</div></div></div>
+      <div class="card-body">
+        ${[
+          {program:'Farmetric (Year 1)',cost:'$88',type:'Platform enrollment',highlight:true},
+          {program:'Traditional microfinance',cost:'$140',type:'Per borrower cost',highlight:false},
+          {program:'Agri extension programme',cost:'$210',type:'Per farmer reached',highlight:false},
+          {program:'Direct cash transfer',cost:'$300',type:'Per household/year',highlight:false},
+          {program:'USAID agritech grant',cost:'$480',type:'Per farmer equivalent',highlight:false},
+        ].map(r=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--cream-dark);background:${r.highlight?'rgba(26,61,43,0.03)':'transparent'};margin:0 -4px;padding-left:4px;border-radius:${r.highlight?'6px':'0'}">
+          <div><div style="font-size:13px;font-weight:${r.highlight?'600':'400'};color:${r.highlight?'var(--forest)':'var(--charcoal)'}">${r.program}${r.highlight?' ◀':''}</div><div style="font-size:10.5px;color:var(--muted)">${r.type}</div></div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:${r.highlight?'var(--success)':'var(--muted)'}">${r.cost}</div>
+        </div>`).join('')}
+        <div style="font-size:10.5px;color:var(--muted);margin-top:10px;font-style:italic">Year 1 cost based on SIF fellowship ($110K) / 1,247 enrolled farmers.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div><div class="card-title">Children in School</div><div class="card-sub">Correlation with Farmetric income premium</div></div></div>
+      <div class="card-body">
+        <div style="margin-bottom:14px"><div style="font-size:12.5px;color:var(--charcoal);line-height:1.6;font-style:italic;border-left:3px solid var(--gold);padding-left:12px">"When a mother earns 20% more, she does not buy luxury. She keeps her children in school and her trees in the ground."</div></div>
+        ${[{label:'Prime borrowers (score 720+)',school:92,farmers:FARMERS.filter(f=>f.creditScore>=720)},{label:'Standard (score 580–719)',school:76,farmers:FARMERS.filter(f=>f.creditScore>=580&&f.creditScore<720)},{label:'Building (score 450–579)',school:61,farmers:FARMERS.filter(f=>f.creditScore>=450&&f.creditScore<580)},{label:'Limited (score < 450)',school:38,farmers:FARMERS.filter(f=>f.creditScore<450)}].map(r=>`<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px"><span style="font-size:12px">${r.label}</span><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--forest);font-weight:600">${r.school}%</span></div><div class="prog-track"><div class="prog-fill" style="width:0" data-w="${r.school}%"></div></div></div>`).join('')}
+        <div class="alert alert-success" style="margin-top:12px">✓ <div><strong>Platform avg: 74% of children in school</strong> vs. 58% regional baseline (UNHCR Northern Uganda 2023).</div></div>
+      </div>
+    </div>
+  </div>`;
+
+  // SROI calculator
+  setTimeout(()=>{
+    const slider=document.getElementById('sroiSlider');
+    if(!slider)return;
+    function updateSROI(v){
+      const farmers=Math.round(v/88);
+      const dep=Math.round(farmers*5.8);
+      const income=Math.round(farmers*0.2*180000/3700);
+      const trees=Math.round(farmers*45);
+      const children=Math.round(farmers*0.74);
+      const ratio=(income*2.8/v).toFixed(1);
+      document.getElementById('sroiAmt').textContent='$'+v.toLocaleString();
+      document.getElementById('sroiFarmers').textContent=farmers.toLocaleString();
+      document.getElementById('sroiDep').textContent=dep.toLocaleString();
+      document.getElementById('sroiIncome').textContent='$'+income.toLocaleString();
+      document.getElementById('sroiTrees').textContent=trees.toLocaleString();
+      document.getElementById('sroiChildren').textContent=children.toLocaleString();
+      document.getElementById('sroiRatio').textContent=ratio+'×';
+    }
+    slider.addEventListener('input',()=>updateSROI(parseInt(slider.value)));
+    updateSROI(parseInt(slider.value));
+  },100);
+}
+
+// ═══════════════════════════════════════════════════
+// FARMER PROFILE
+// ═══════════════════════════════════════════════════
+function renderFarmerProfile(f){
+  const pc=document.getElementById('pageContent');
+  document.getElementById('topTitle').textContent=f.name;
+  document.getElementById('topCrumb').textContent='← Back to Farmers';
+  document.getElementById('topCrumb').onclick=()=>navigate('farmers');
+  document.getElementById('topActions').innerHTML=`<button class="btn btn-outline">Download Profile</button><button class="btn btn-gold">Create Transaction</button><div class="notif-btn" id="notifBtn"><svg width="16" height="16" fill="none" stroke="var(--charcoal)" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="notif-dot"></div></div>`;
+
+  const comps=[
+    {label:'Identity Verification',score:f.verified?148:60,max:150,note:'National ID + cooperative ID confirmed'},
+    {label:'Land Documentation',score:f.acres>3?182:f.acres>2?148:100,max:200,note:'GPS mapped, acreage confirmed'},
+    {label:'Production History',score:Math.min(200,f.trees*1.4+f.txns*12),max:200,note:'Yield records across seasons'},
+    {label:'Market Participation',score:Math.min(150,f.txns*35+f.creditScore*0.08),max:150,note:'Premium transactions & standing'},
+    {label:'Platform Compliance',score:f.verified?Math.min(150,120+f.txns*10):55,max:150,note:'Data completeness & officer visits'},
+  ];
+  const totalScore=f.creditScore;
+  const cc=creditColor(totalScore);
+  const tierLabel=totalScore>=720?'Prime Borrower':totalScore>=580?'Standard':totalScore>=450?'Building Credit':'Limited Profile';
+  const tcls=tierCls(f.creditTier);
+
+  const radius=52,cx=68,cy=68,circ=2*Math.PI*radius,dash=circ*(totalScore/850);
+  const scoreRing=`<svg width="136" height="136" viewBox="0 0 136 136"><circle cx="${cx}" cy="${cy}" r="${radius}" fill="none" stroke="var(--cream-dark)" stroke-width="9"/><circle cx="${cx}" cy="${cy}" r="${radius}" fill="none" stroke="${cc}" stroke-width="9" stroke-dasharray="${dash} ${circ}" stroke-dashoffset="${circ*.25}" stroke-linecap="round" transform="rotate(-90 ${cx} ${cy})"/><text x="${cx}" y="${cy-5}" text-anchor="middle" font-family="Cormorant Garamond,serif" font-size="25" font-weight="600" fill="var(--forest)">${totalScore}</text><text x="${cx}" y="${cy+12}" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="8.5" fill="var(--muted)" letter-spacing="1">FARMETRIC SCORE</text></svg>`;
+
+  // Income sparkline
+  const incMax=Math.max(...f.seasonalIncome.filter(v=>v>0));
+  const sparkBars=f.seasonalIncome.map((v,i)=>{const h=v>0?Math.round((v/incMax)*44):4;const clr=i===f.seasonalIncome.length-1?'var(--forest)':'var(--forest-light)';return `<div class="ib" style="flex:1;height:${h}px;background:${clr};opacity:${v>0?1:.25}" title="${v>0?'UGX '+v.toLocaleString():'No data'}"></div>`;}).join('');
+
+  pc.innerHTML=`
+  <div class="fp-hero">
+    <div class="fp-portrait">${getPortrait(f.id)}</div>
+    <div style="flex:1">
+      <div class="fp-name">${f.name}</div>
+      <div class="fp-id">${f.id} · ${f.district} District, Northern Uganda</div>
+      <div class="fp-badges">${f.verified?`<span class="m-badge mb-g">✓ Verified</span>`:`<span class="m-badge mb-o">⟳ Pending</span>`}${f.tags.map(t=>`<span class="m-badge mb-w">${t}</span>`).join('')}</div>
+      <div class="fp-meta-row">
+        <div><div class="fp-ml">Cooperative</div><div class="fp-mv">${f.coop}</div></div>
+        <div><div class="fp-ml">Officer</div><div class="fp-mv">${f.officer}</div></div>
+        <div><div class="fp-ml">Phone</div><div class="fp-mv" style="font-family:'DM Mono',monospace;font-size:12px">${f.phone}</div></div>
+        <div><div class="fp-ml">Enrolled</div><div class="fp-mv">${f.joined}</div></div>
+        <div><div class="fp-ml">Updated</div><div class="fp-mv">${f.lastUpdate}</div></div>
+      </div>
+    </div>
+    <div class="fp-score-badge">${scoreRing}<div class="fp-score-lbl"><span class="credit-tier ${tcls}">${tierLabel}</span></div></div>
+  </div>
+
+  <div class="farmer-story">
+    <div class="story-text">${f.story}</div>
+    <div class="story-attr">— ${f.name}, ${f.district} District</div>
+  </div>
+
+  <div class="g3 mb20">
+    <div class="card"><div class="card-head"><div><div class="card-title">Farm Details</div></div></div><div class="card-body"><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">${[{l:'Land Size',v:`${f.acres} acres`},{l:'Shea Trees',v:f.trees},{l:'Est. Annual Yield',v:`${f.yield} tonnes`},{l:'GPS',v:`<span style="font-size:11.5px;font-family:'DM Mono',monospace;color:var(--muted)">${f.gps}</span>`},{l:'Est. Revenue',v:`<strong style="color:var(--forest)">${f.revenue}</strong>`},{l:'Premium Txns',v:f.txns}].map(r=>`<div><div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;margin-bottom:2px">${r.l}</div><div style="font-size:14px;font-weight:500">${r.v}</div></div>`).join('')}</div></div></div>
+    <div class="card"><div class="card-head"><div><div class="card-title">Household & Welfare</div></div></div><div class="card-body"><div class="welfare-grid" style="grid-template-columns:1fr 1fr">${[{icon:'👨‍👩‍👧‍👦',val:f.dependents,label:'Dependents'},{icon:'🎒',val:f.childrenInSchool,label:'Children in school'},{icon:'🌾',val:`${f.foodSecurity}/5`,label:'Food security score'},{icon:'🏦',val:f.creditTier,label:'Credit tier'}].map(w=>`<div class="welfare-item"><div class="welfare-icon">${w.icon}</div><div class="welfare-val">${w.val}</div><div class="welfare-label">${w.label}</div></div>`).join('')}</div></div></div>
+    <div class="card"><div class="card-head"><div><div class="card-title">Income Trend</div><div class="card-sub">Seasonal earnings (UGX)</div></div></div><div class="card-body"><div class="income-bars">${sparkBars}</div><div style="display:flex;gap:2px;margin-top:6px">${['S1 24','S2 24','S1 25'].map(s=>`<div style="flex:1;text-align:center;font-size:9px;color:var(--muted)">${s}</div>`).join('')}</div><div style="margin-top:12px;display:flex;justify-content:space-between;font-size:11px"><span style="color:var(--muted)">Latest season</span><span style="font-family:'DM Mono',monospace;font-weight:600;color:var(--forest)">UGX ${f.seasonalIncome[f.seasonalIncome.length-1]>0?f.seasonalIncome[f.seasonalIncome.length-1].toLocaleString():'—'}</span></div></div></div>
+  </div>
+
+  <div class="g2 mb20">
+    <div class="card"><div class="card-head"><div><div class="card-title">Farmetric Credit Score</div><div class="card-sub">Creditworthiness breakdown</div></div></div><div class="card-body">
+      <div class="alert ${totalScore>=720?'alert-success':totalScore>=580?'alert-warn':'alert-info'}" style="margin-bottom:14px">${totalScore>=720?`✓ <strong>Prime Borrower.</strong> Qualifies for microfinance and advance purchase contracts.`:totalScore>=580?`⚠ <strong>Standard.</strong> Basic credit eligible. Score improves with premium transactions.`:`ℹ <strong>Building.</strong> Complete GPS verification and first premium transaction.`}</div>
+      ${comps.map(c=>{const pct=Math.round(c.score/c.max*100);const fc=pct>=80?'var(--forest)':pct>=60?'var(--gold)':'var(--danger)';return `<div class="score-component"><div style="width:170px;flex-shrink:0"><div style="font-size:12px;font-weight:500">${c.label}</div><div style="font-size:10px;color:var(--muted);margin-top:1px">${c.note}</div></div><div class="score-comp-track"><div class="score-comp-fill" style="width:0;background:${fc}" data-w="${pct}%"></div></div><div style="font-family:'DM Mono',monospace;font-size:10.5px;color:var(--muted);width:56px;text-align:right;flex-shrink:0">${c.score}/${c.max}</div></div>`;}).join('')}
+      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--cream-dark)"><div style="font-size:11px;color:var(--muted);margin-bottom:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em">What this score unlocks</div><div class="g2">${[{label:'Microfinance Loan',sub:'UGX 500K–5M mobile money',ok:totalScore>=450},{label:'Premium Buyer Access',sub:'EUDR-compliant contracts',ok:totalScore>=580},{label:'Carbon Credit Enrolment',sub:'Requires GPS + tree census',ok:totalScore>=520},{label:'Organic Cert. Track',sub:'2-season clean record needed',ok:f.tags.includes('Organic')},{label:'Advance Purchase Contract',sub:'Seasonal volume guarantee',ok:totalScore>=700},{label:'Group Loan Leadership',sub:'Cooperative-backed guarantee',ok:totalScore>=750}].map(u=>`<div style="display:flex;align-items:flex-start;gap:7px;padding:8px;border-radius:8px;background:${u.ok?'#e8f5e9':'#fafafa'};border:1px solid ${u.ok?'#a5d6a7':'var(--cream-dark)'}"><span style="font-size:14px;margin-top:1px">${u.ok?'✓':'○'}</span><div><div style="font-size:12px;font-weight:600;color:${u.ok?'#1b5e20':'var(--muted)'}">${u.label}</div><div style="font-size:10px;color:var(--muted);margin-top:2px">${u.sub}</div></div></div>`).join('')}</div></div>
+    </div></div>
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <div class="card"><div class="card-head"><div><div class="card-title">Activity Timeline</div></div></div><div class="card-body"><div class="timeline">${[{d:'Mar 2025',e:`Premium transaction completed — ${f.yield}t @ UGX 5,040/kg.`},{d:'Feb 2025',e:'EUDR origin documentation complete.'},{d:'Jan 2025',e:`GPS plot mapping: ${f.gps}`},{d:'Dec 2024',e:`Enrolled via ${f.coop}. Officer: ${f.officer}.`}].map(e=>`<div class="tl-item"><div class="tl-date">${e.d}</div><div class="tl-event">${e.e}</div></div>`).join('')}</div></div></div>
+      <div class="card"><div class="card-head"><div><div class="card-title">Score Improvement Path</div></div></div><div class="card-body">${[{a:'Complete first premium transaction',pts:'+35 pts',done:f.txns>0,pri:'High'},{a:'Upload second season yield records',pts:'+22 pts',done:false,pri:'High'},{a:'Organic certification',pts:'+28 pts',done:f.tags.includes('Organic'),pri:'Medium'},{a:'Carbon credit enrolment',pts:'+18 pts',done:f.tags.includes('Carbon'),pri:'Medium'},{a:'Confirm national ID',pts:'+15 pts',done:f.verified,pri:'High'},{a:'GPS high-accuracy re-map',pts:'+10 pts',done:f.gps!=='Pending',pri:'Low'}].map(s=>`<div style="display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid var(--cream-dark)"><span style="font-size:14px">${s.done?'✅':'⬜'}</span><div style="flex:1"><div style="font-size:12px;font-weight:500;color:${s.done?'var(--muted)':'var(--charcoal)'}${s.done?';text-decoration:line-through':''}">${s.a}</div><div style="font-size:10px;color:var(--muted);margin-top:1px">Priority: ${s.pri}</div></div><span class="badge ${s.done?'badge-grey':'badge-green'}">${s.done?'Done':s.pts}</span></div>`).join('')}</div></div>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════════════
+function openFarmerModal(id){
+  const f=FARMERS.find(x=>x.id===id);if(!f)return;
+  document.getElementById('mPortrait').innerHTML=getPortrait(f.id);
+  document.getElementById('mName').textContent=f.name;
+  document.getElementById('mMeta').textContent=f.id+' · '+f.district+' District';
+  document.getElementById('mBadges').innerHTML=[f.verified?`<span class="m-badge mb-g">✓ Verified</span>`:`<span class="m-badge mb-o">⟳ Pending</span>`,...f.tags.map(t=>`<span class="m-badge mb-w">${t}</span>`)].join('');
+  const yp=Math.min(100,(f.yield/3)*100);
+  document.getElementById('mBody').innerHTML=`
+    <div class="m-section">Farm & Identity</div>
+    <div class="detail-grid"><div><div class="di-l">Land</div><div class="di-v">${f.acres} acres</div></div><div><div class="di-l">Trees</div><div class="di-v">${f.trees}</div></div><div><div class="di-l">Est. Yield</div><div class="di-v">${f.yield}t/year</div></div><div><div class="di-l">GPS</div><div class="di-v" style="font-size:11.5px;font-family:'DM Mono',monospace;color:var(--muted)">${f.gps}</div></div><div><div class="di-l">Phone</div><div class="di-v" style="font-family:'DM Mono',monospace;font-size:12.5px">${f.phone}</div></div><div><div class="di-l">Revenue est.</div><div class="di-v" style="color:var(--forest)">${f.revenue}</div></div><div><div class="di-l">Txns</div><div class="di-v">${f.txns}</div></div></div>
+    <div class="m-section">Household</div>
+    <div style="display:flex;gap:10px;margin-bottom:16px">
+      <div style="flex:1;background:var(--cream);border-radius:8px;padding:12px;text-align:center"><div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--forest)">${f.dependents}</div><div style="font-size:10px;color:var(--muted);margin-top:2px">Dependents</div></div>
+      <div style="flex:1;background:var(--cream);border-radius:8px;padding:12px;text-align:center"><div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--forest)">${f.childrenInSchool}</div><div style="font-size:10px;color:var(--muted);margin-top:2px">In school</div></div>
+      <div style="flex:1;background:var(--cream);border-radius:8px;padding:12px;text-align:center"><div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--forest)">${f.foodSecurity}/5</div><div style="font-size:10px;color:var(--muted);margin-top:2px">Food security</div></div>
+    </div>
+    <div class="m-section">Yield vs. Platform</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><span style="font-size:11px;color:var(--muted);width:90px">This farmer</span><div class="prog-track" style="flex:1"><div class="prog-fill" style="width:${yp}%"></div></div><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--forest);width:30px">${f.yield}t</span></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px"><span style="font-size:11px;color:var(--muted);width:90px">Avg (1.25t)</span><div class="prog-track" style="flex:1"><div class="prog-fill gold" style="width:41.7%"></div></div><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);width:30px">1.25t</span></div>
+    <div class="m-section">Credit Score</div>
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px"><div style="font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:600;color:${creditColor(f.creditScore)}">${f.creditScore}</div><div><span class="credit-tier ${tierCls(f.creditTier)}">${f.creditTier}</span><div style="font-size:11.5px;color:var(--muted);margin-top:6px">${f.creditTier==='Prime'?'Qualifies for microfinance & premium contracts.':f.creditTier==='Standard'?'Basic credit products available.':'Complete verification to improve score.'}</div></div><button class="btn btn-primary" style="margin-left:auto" onclick="closeModal();navigate('farmer_profile');renderFarmerProfile(FARMERS.find(x=>x.id==='${f.id}'))">Full Profile →</button></div>
+    <div class="m-section">Story</div>
+    <div class="farmer-story" style="margin-bottom:0"><div class="story-text" style="font-size:15px">${f.story}</div></div>`;
+  document.getElementById('modalOverlay').classList.add('open');
+  setTimeout(animateAll,80);
+}
+
+function closeModal(){document.getElementById('modalOverlay').classList.remove('open');}
+document.getElementById('modalOverlay').addEventListener('click',e=>{if(e.target===document.getElementById('modalOverlay'))closeModal();});
+
+// ═══════════════════════════════════════════════════
+// NOTIFICATIONS
+// ═══════════════════════════════════════════════════
+function toggleNotif(){const p=document.getElementById('notifPanel');p.classList.toggle('open');}
+document.addEventListener('click',e=>{const p=document.getElementById('notifPanel');const btn=document.getElementById('notifBtn');if(p&&p.classList.contains('open')&&!p.contains(e.target)&&e.target!==btn&&!btn.contains(e.target))p.classList.remove('open');});
+
+// ═══════════════════════════════════════════════════
+// ANIMATIONS
+// ═══════════════════════════════════════════════════
+function animateAll(){
+  document.querySelectorAll('.prog-fill[data-w],.score-comp-fill[data-w]').forEach(el=>{const w=el.dataset.w;requestAnimationFrame(()=>{setTimeout(()=>{el.style.width=w;},100);});});
+  document.querySelectorAll('.bc-bar[data-h]').forEach(bar=>{const h=bar.dataset.h;setTimeout(()=>{bar.style.height=h+'px';},200);});
+  document.querySelectorAll('.cu[data-t],.ih-stat-val[data-t]').forEach(el=>{const target=parseInt(el.dataset.t);let start=0;const step=target/90;const timer=setInterval(()=>{start+=step;if(start>=target){el.textContent=target.toLocaleString();clearInterval(timer);return;}el.textContent=Math.floor(start).toLocaleString();},16);});
+  document.querySelectorAll('.bc-bar[data-val],.ib').forEach(bar=>{
+    bar.onmousemove=(e)=>{const tt=document.getElementById('tooltip');tt.textContent=bar.dataset.val||bar.title;tt.style.opacity='1';tt.style.left=(e.clientX+12)+'px';tt.style.top=(e.clientY-28)+'px';};
+    bar.onmouseleave=()=>{document.getElementById('tooltip').style.opacity='0';};
+  });
+}
+
+function showTip(e,txt){const tt=document.getElementById('tooltip');tt.textContent=txt;tt.style.opacity='1';tt.style.left=(e.clientX+12)+'px';tt.style.top=(e.clientY-28)+'px';}
+function hideTip(){document.getElementById('tooltip').style.opacity='0';}
+
+// ═══════════════════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════════════════
+document.getElementById('sidebarNav').addEventListener('click',e=>{
+  const item=e.target.closest('.nav-item');if(!item||!item.dataset.page)return;
+  farmerFilter='all';farmerSearch='';farmerPage=1;
+  navigate(item.dataset.page);
+});
+
+navigate('dashboard');
+</script>
+</body>
+</html>

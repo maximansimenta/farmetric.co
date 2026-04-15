@@ -284,6 +284,21 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--charco
 /* INCOME CHART (mini sparkline bars) */
 .income-bars{display:flex;align-items:flex-end;gap:3px;height:52px;}
 .ib{border-radius:3px 3px 0 0;transition:height 1s ease;cursor:pointer;}
+/* GALLERY */
+.gal-img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .45s ease;}
+.gal-card{cursor:zoom-in;border-radius:12px;overflow:hidden;position:relative;flex:1;background:#1a3d2b;}
+.gal-card:hover .gal-img{transform:scale(1.05);}
+.gal-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.6) 0%,transparent 55%);pointer-events:none;}
+.gal-label{position:absolute;bottom:0;left:0;right:0;padding:14px 16px;pointer-events:none;}
+.gal-tag{font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-bottom:3px;}
+.gal-cap{font-family:'Cormorant Garamond',serif;font-size:13px;color:white;line-height:1.35;}
+.gal-lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.94);z-index:600;align-items:center;justify-content:center;flex-direction:column;padding:20px;}
+.gal-lightbox.open{display:flex;}
+.gal-lb-img{max-width:90vw;max-height:78vh;object-fit:contain;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,0.6);}
+.gal-lb-btn{background:rgba(255,255,255,0.1);border:none;color:white;cursor:pointer;backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;}
+.gal-lb-btn:hover{background:rgba(255,255,255,0.2);}
+.gal-lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:48px;height:48px;border-radius:50%;font-size:26px;}
+.gal-lb-close{position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:8px;font-size:18px;}
 .ib:hover{opacity:.8;}
 /* HAMBURGER */
 .hamburger{display:none;flex-direction:column;justify-content:center;align-items:center;gap:5px;width:36px;height:36px;background:white;border:1.5px solid var(--cream-dark);border-radius:8px;cursor:pointer;flex-shrink:0;}
@@ -361,6 +376,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--charco
     <div class="nav-item" data-page="audit"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Verification Audit</div>
     <div class="nav-section">Partnerships</div>
     <div class="nav-item" data-page="partnerships"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><circle cx="9" cy="7" r="4"/></svg>Buyer Partnerships</div>
+    <div class="nav-item" data-page="gallery"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Field Gallery</div>
     <div class="nav-item" data-page="impact"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>Impact Hub</div>
   </nav>
   <div class="sidebar-footer">
@@ -496,7 +512,7 @@ function tierCls(t){return t==='Prime'?'tier-prime':t==='Standard'?'tier-standar
 // ROUTER
 // ═══════════════════════════════════════════════════
 let farmerPage=1,perPage=6,farmerFilter='all',farmerSearch='';
-const TITLES={dashboard:'Dashboard',farmers:'Farmer Registry',cooperatives:'Cooperatives',transactions:'Transactions & Revenue',production:'Production Analytics',carbon:'Carbon Credits',market:'Market Access',eudr:'EUDR Reports',audit:'Verification Audit',partnerships:'Buyer Partnerships',impact:'Impact Hub',farmer_profile:'Farmer Profile'};
+const TITLES={dashboard:'Dashboard',farmers:'Farmer Registry',cooperatives:'Cooperatives',transactions:'Transactions & Revenue',production:'Production Analytics',carbon:'Carbon Credits',market:'Market Access',eudr:'EUDR Reports',audit:'Verification Audit',partnerships:'Buyer Partnerships',impact:'Impact Hub',gallery:'Field Gallery — Northern Uganda',farmer_profile:'Farmer Profile'};
 
 function navigate(page,data=null){
   document.querySelectorAll('.nav-item').forEach(el=>el.classList.toggle('active',el.dataset.page===page));
@@ -505,7 +521,7 @@ function navigate(page,data=null){
   document.getElementById('topCrumb').onclick=null;
   document.getElementById('topActions').innerHTML=`<div class="notif-btn" id="notifBtn"><svg width="16" height="16" fill="none" stroke="var(--charcoal)" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="notif-dot"></div></div>`;
   document.getElementById('pageContent').innerHTML='';
-  const R={dashboard:renderDashboard,farmers:renderFarmers,cooperatives:renderCoops,transactions:renderTransactions,production:renderProduction,carbon:renderCarbon,market:renderMarket,eudr:renderEUDR,audit:renderAudit,partnerships:renderPartnerships,impact:renderImpact};
+  const R={dashboard:renderDashboard,farmers:renderFarmers,cooperatives:renderCoops,transactions:renderTransactions,production:renderProduction,carbon:renderCarbon,market:renderMarket,eudr:renderEUDR,audit:renderAudit,partnerships:renderPartnerships,impact:renderImpact,gallery:renderGallery};
   if(page==='farmer_profile'&&data)renderFarmerProfile(data);
   else if(R[page])R[page]();
   setTimeout(()=>{
@@ -1341,6 +1357,167 @@ function animateAll(){
 
 function showTip(e,txt){const tt=document.getElementById('tooltip');tt.textContent=txt;tt.style.opacity='1';tt.style.left=(e.clientX+12)+'px';tt.style.top=(e.clientY-28)+'px';}
 function hideTip(){document.getElementById('tooltip').style.opacity='0';}
+
+// ═══════════════════════════════════════════════════
+// FIELD GALLERY
+// ═══════════════════════════════════════════════════
+const GALLERY_IMGS=[
+  {src:'images/farmer.jpg',    tag:'The Farmer',    cap:'A farmer stands before her shea tree in Lamwo District, Northern Uganda'},
+  {src:'images/homestead.jpg', tag:'The Landscape', cap:'A family homestead in Northern Uganda — shea trees standing in the background'},
+  {src:'images/farms.jpg',     tag:'The Asset',     cap:'Shea tree farms across the Northern Uganda savanna'},
+  {src:'images/processing.jpg',tag:'The Work',      cap:'Women processing shea nuts under a tree — a tradition passed down through generations'},
+  {src:'images/tree.jpg',      tag:'The Tree',      cap:'A mature shea tree — can live over 200 years, producing nuts for decades'},
+  {src:'images/fruit.jpg',     tag:'The Fruit',     cap:"Shea nuts ripening on the branch — the source of one of the world's most valuable natural butters"},
+  {src:'images/cut_tree.jpg',  tag:'The Problem',   cap:'A shea tree cut for charcoal — the fastest cash available to a farmer with no market access'},
+  {src:'images/felled.jpg',    tag:'The Loss',      cap:'Shea trees felled for timber — when a living tree is worth more dead than alive, something has failed'},
+  {src:'images/locusts.jpg',   tag:'The Threat',    cap:'A shea tree stripped by locusts — one of many threats facing farmers with no financial safety net'},
+];
+let galIdx=0;
+
+function galOpen(i){
+  galIdx=i;
+  const lb=document.getElementById('galLightbox');
+  const d=GALLERY_IMGS[i];
+  document.getElementById('galLbImg').src=d.src;
+  document.getElementById('galLbTag').textContent=d.tag;
+  document.getElementById('galLbCap').textContent=d.cap;
+  document.getElementById('galLbCount').textContent=(i+1)+' / '+GALLERY_IMGS.length;
+  lb.classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function galClose(){
+  document.getElementById('galLightbox').classList.remove('open');
+  document.body.style.overflow='';
+}
+function galNav(dir){
+  galIdx=(galIdx+dir+GALLERY_IMGS.length)%GALLERY_IMGS.length;
+  galOpen(galIdx);
+}
+document.addEventListener('keydown',function(e){
+  if(!document.getElementById('galLightbox').classList.contains('open'))return;
+  if(e.key==='Escape')galClose();
+  if(e.key==='ArrowLeft')galNav(-1);
+  if(e.key==='ArrowRight')galNav(1);
+});
+
+function makeGalCard(i,h){
+  const d=GALLERY_IMGS[i];
+  const wrap=document.createElement('div');
+  wrap.className='gal-card';
+  wrap.style.height=h+'px';
+  wrap.onclick=function(){galOpen(i);};
+
+  const img=document.createElement('img');
+  img.className='gal-img';
+  img.src=d.src;
+  img.alt=d.cap;
+  img.loading='lazy';
+
+  const ov=document.createElement('div');
+  ov.className='gal-overlay';
+
+  const lbl=document.createElement('div');
+  lbl.className='gal-label';
+
+  const tag=document.createElement('div');
+  tag.className='gal-tag';
+  tag.textContent=d.tag;
+
+  const cap=document.createElement('div');
+  cap.className='gal-cap';
+  cap.textContent=d.cap;
+
+  lbl.appendChild(tag);
+  lbl.appendChild(cap);
+  wrap.appendChild(img);
+  wrap.appendChild(ov);
+  wrap.appendChild(lbl);
+  return wrap;
+}
+
+function renderGallery(){
+  const pc=document.getElementById('pageContent');
+  pc.innerHTML='';
+
+  // Header
+  const hdr=document.createElement('div');
+  hdr.style.cssText='margin-bottom:24px';
+  hdr.innerHTML='<div style="font-family:\'Cormorant Garamond\',serif;font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Field Documentation · Northern Uganda</div>'
+    +'<div style="font-family:\'Cormorant Garamond\',serif;font-size:32px;font-weight:600;color:var(--forest);line-height:1.1;margin-bottom:10px">The Shea Tree — Life, Loss &amp; Livelihood</div>'
+    +'<div style="font-size:13.5px;color:var(--muted);max-width:600px;line-height:1.65">From a family homestead in Lamwo to a freshly felled trunk in Otuke, these photographs document the world Farmetric exists to change. Every tree represents income, carbon, and a family\'s future.</div>';
+  pc.appendChild(hdr);
+
+  // HERO — farmer (index 0)
+  const hero=document.createElement('div');
+  hero.style.cssText='cursor:zoom-in;border-radius:16px;overflow:hidden;margin-bottom:12px;position:relative;height:440px;background:#1a3d2b';
+  hero.onclick=function(){galOpen(0);};
+  const heroImg=document.createElement('img');
+  heroImg.src=GALLERY_IMGS[0].src;
+  heroImg.alt=GALLERY_IMGS[0].cap;
+  heroImg.loading='eager';
+  heroImg.className='gal-img';
+  const heroOv=document.createElement('div');
+  heroOv.style.cssText='position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.62) 0%,rgba(0,0,0,0.04) 50%)';
+  const heroLabel=document.createElement('div');
+  heroLabel.style.cssText='position:absolute;bottom:0;left:0;right:0;padding:24px 28px';
+  heroLabel.innerHTML='<div style="font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-light);margin-bottom:6px">'+GALLERY_IMGS[0].tag+'</div>'
+    +'<div style="font-family:\'Cormorant Garamond\',serif;font-size:22px;color:white;line-height:1.3;max-width:500px">'+GALLERY_IMGS[0].cap+'</div>';
+  const heroHint=document.createElement('div');
+  heroHint.style.cssText='position:absolute;top:14px;right:14px;background:rgba(0,0,0,0.38);border-radius:6px;padding:5px 10px;font-size:10.5px;color:rgba(255,255,255,0.75);backdrop-filter:blur(6px)';
+  heroHint.textContent='🔍 Tap to expand';
+  hero.appendChild(heroImg);
+  hero.appendChild(heroOv);
+  hero.appendChild(heroLabel);
+  hero.appendChild(heroHint);
+  pc.appendChild(hero);
+
+  // ROW 1 — indices 1,2,3
+  const row1=document.createElement('div');
+  row1.style.cssText='display:flex;gap:12px;margin-bottom:12px;align-items:stretch';
+  [1,2,3].forEach(function(i){row1.appendChild(makeGalCard(i,220));});
+  pc.appendChild(row1);
+
+  // QUOTE
+  const quote=document.createElement('div');
+  quote.style.cssText='background:linear-gradient(135deg,var(--forest),#1f5038);border-radius:12px;padding:22px 26px;margin-bottom:12px;display:flex;align-items:flex-start;gap:16px';
+  quote.innerHTML='<div style="font-size:52px;color:var(--gold-light);opacity:.32;font-family:\'Cormorant Garamond\',serif;line-height:.8;flex-shrink:0;margin-top:-4px">&ldquo;</div>'
+    +'<div><div style="font-family:\'Cormorant Garamond\',serif;font-size:18px;font-style:italic;color:white;line-height:1.6;margin-bottom:8px">20 of 25 farmers we interviewed said it is easier to sell charcoal from a cut shea tree than to find a buyer for shea nuts. Farmetric exists to change that equation.</div>'
+    +'<div style="font-size:11px;color:rgba(255,255,255,0.4);letter-spacing:.06em">— Field research, Northern Uganda, December 2024</div></div>';
+  pc.appendChild(quote);
+
+  // ROW 2 — indices 4,5,6
+  const row2=document.createElement('div');
+  row2.style.cssText='display:flex;gap:12px;margin-bottom:12px;align-items:stretch';
+  [4,5,6].forEach(function(i){row2.appendChild(makeGalCard(i,260));});
+  pc.appendChild(row2);
+
+  // ROW 3 — indices 7,8
+  const row3=document.createElement('div');
+  row3.style.cssText='display:flex;gap:12px;margin-bottom:24px;align-items:stretch';
+  [7,8].forEach(function(i){row3.appendChild(makeGalCard(i,240));});
+  pc.appendChild(row3);
+
+  // LIGHTBOX (append once, reuse)
+  if(!document.getElementById('galLightbox')){
+    const lb=document.createElement('div');
+    lb.id='galLightbox';
+    lb.className='gal-lightbox';
+    lb.onclick=galClose;
+    lb.innerHTML=
+      '<div style="position:absolute;top:16px;right:16px;display:flex;align-items:center;gap:12px">'
+      +'<span id="galLbCount" style="font-family:\'DM Mono\',monospace;font-size:11px;color:rgba(255,255,255,0.35)"></span>'
+      +'<button class="gal-lb-btn gal-lb-close" onclick="galClose()">✕</button>'
+      +'</div>'
+      +'<button class="gal-lb-btn gal-lb-nav" style="left:16px" onclick="event.stopPropagation();galNav(-1)">‹</button>'
+      +'<img id="galLbImg" src="" alt="" style="max-width:90vw;max-height:78vh;object-fit:contain;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,0.6)" onclick="event.stopPropagation()">'
+      +'<div style="margin-top:18px;text-align:center" onclick="event.stopPropagation()">'
+      +'<div id="galLbTag" style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-light);margin-bottom:5px"></div>'
+      +'<div id="galLbCap" style="font-family:\'Cormorant Garamond\',serif;font-size:18px;color:rgba(255,255,255,0.88);max-width:580px;line-height:1.5"></div>'
+      +'</div>'
+      +'<button class="gal-lb-btn gal-lb-nav" style="right:16px" onclick="event.stopPropagation();galNav(1)">›</button>';
+    document.body.appendChild(lb);
+  }
+}
 
 // ═══════════════════════════════════════════════════
 // NAV
